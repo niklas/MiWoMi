@@ -1,8 +1,7 @@
-require 'miwomi/block'
-require 'miwomi/item'
+require 'miwomi/parser'
 
 module Miwomi
-  class DumpParser
+  class DumpParser < Parser
 
     class Exception < ::Exception; end
     class BadLine < Exception; end
@@ -25,10 +24,6 @@ module Miwomi
       end
     end
 
-    def parse_file(file_path)
-      parse File.read(file_path)
-    end
-
     private
 
     NameAndId = /^Name:\s+(?<name>.+).\s+ID:\s+(?<id>\d+)$/i
@@ -49,10 +44,5 @@ module Miwomi
       end
     end
 
-    def new_result
-      [].tap do |r|
-        yield r
-      end.compact
-    end
   end
 end

@@ -41,7 +41,8 @@ describe Miwomi::DumpParser do
 
     let(:yogcraft_file) { File.expand_path '../../fixtures/yogcraft-1.0.neidump', __FILE__ }
     it 'parses YogCraft-1.0 NEI dump' do
-      subject.parse_file yogcraft_file
+      results = subject.parse_file yogcraft_file
+      results.should have_at_least(200).items
     end
   end
 end

@@ -1,6 +1,4 @@
 require 'miwomi/parser'
-require 'miwomi/block'
-require 'miwomi/item'
 require 'csv'
 
 module Miwomi
@@ -19,10 +17,8 @@ module Miwomi
           case row[:blockitem]
           when 'null'
             # ignore that
-          when 'Block'
-           result << Block.new( row[:id].to_i, row[:unlocalised_name] )
-          when 'Item'
-           result << Item.new( row[:id].to_i, row[:unlocalised_name] )
+          when /^Block|Item$/
+           result.add_thing row[:blockitem], row[:id].to_i, row[:unlocalised_name]
           else
             raise BadThing, row
           end

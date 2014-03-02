@@ -31,7 +31,7 @@ module Miwomi
 
     private
 
-    NameAndId = /^Name:\s+(?<name>\S+).\s+ID:\s+(?<id>\d+)$/
+    NameAndId = /^Name:\s+(?<name>.+).\s+ID:\s+(?<id>\d+)$/i
 
     def found_block(line)
       if match = line.match(NameAndId)

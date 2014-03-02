@@ -35,14 +35,21 @@ module MineCraft
 
     def save
       if @region
-        @region.exportToFile @region_path
+        copy = "#{@region_path}.recent"
+        debug { "saving to #{copy}" }
+        @region.exportToFile copy
+        debug { "saved." }
+        File.mv copy, @region_path
+        debug { "overwritten original #{@region_path}." }
       end
     end
 
     private
 
     def region
-      @region ||= Region.fromFile(@region_path)
+      return @region if @region
+      debug { "loading from #{@region_path}" }
+      @region = Region.fromFile(@region_path)
     end
 
     def generate_entrance
@@ -50,6 +57,13 @@ module MineCraft
       c.each do |block, z, x, y|
          block.name = :wool
          block.color = :orange
+      end
+    end
+
+    def debug(msg='')
+      STDERR.puts msg unless msg.empty?
+      if block_given?
+        STDERR.puts yield
       end
     end
   end
@@ -67,8 +81,11 @@ if __FILE__ == $0
 
   begin
     MineCraft::FileLandscape.generate *ARGV
-  rescue Exception => e
+  rescue RuntimeError => e
+    raise e
+  rescue StandardError => e
     STDERR.puts e.message
+    raise e
     exit -10
   end
 end

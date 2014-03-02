@@ -13,6 +13,11 @@ describe Miwomi::DumpParser do
         subject.parse "Trololol. Game: lost\n"
       }.to raise_error(described_class::BadLine)
     end
+
+    let(:yogcraft_file) { File.expand_path '../../fixtures/yogcraft-1.0.neidump', __FILE__ }
+    it 'parses YogCraft-1.0 NEI dump' do
+      subject.parse_file yogcraft_file
+    end
   end
 end
 

@@ -15,6 +15,10 @@ module Miwomi
       end
     end
 
+    def parse_file(file_path)
+      parse File.read(file_path)
+    end
+
     private
 
     def new_result

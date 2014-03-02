@@ -7,6 +7,8 @@ module MineCraft
   class FileLandscape
     include RubyCraft
 
+    Base = 4
+
     class WorldNotFound < Errno::ENOENT
       def message
         "World not found, please generate with minecraft first: #{super}"
@@ -44,7 +46,7 @@ module MineCraft
     end
 
     def generate_entrance
-      c = region.cube(0, 0, 0, :width => 50, :length => 50, :height => 128)
+      c = region.cube(Base, 0, 0, :width => 10, :length => 10, :height => 12)
       c.each do |block, z, x, y|
          block.name = :wool
          block.color = :orange

@@ -6,11 +6,13 @@ describe Miwomi::DumpParser do
     it 'detects Block' do
       result = subject.parse BlockDump
       result.should have(5).items
+      result.map(&:id).should == [1,2,3,4,14]
     end
 
     it 'detects Item' do
       result = subject.parse ItemDump
       result.should have(5).items
+      result.map(&:id).should == [256,257,258,259, 281]
     end
 
     it 'complains about bad lines' do
@@ -31,7 +33,7 @@ Block. Name: tile.stone. ID: 1
 Block. Name: tile.grass. ID: 2
 Block. Name: tile.dirt. ID: 3
 Block. Name: tile.stonebrick. ID: 4
-Block. Name: tile.wood. ID: 5
+Block. Name: tile.oreGold. ID: 14
 EODUMP
 
 ItemDump = <<-EODUMP
@@ -39,5 +41,5 @@ Item. Name: item.shovelIron. ID: 256
 Item. Name: item.pickaxeIron. ID: 257
 Item. Name: item.hatchetIron. ID: 258
 Item. Name: item.flintAndSteel. ID: 259
-Item. Name: item.apple. ID: 260
+Item. Name: item.bowl. ID: 281
 EODUMP

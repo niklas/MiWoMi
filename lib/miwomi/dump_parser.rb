@@ -3,12 +3,17 @@ require 'miwomi/item'
 
 module Miwomi
   class DumpParser
+
+    class Exception < ::Exception; end
     class BadLine < Exception; end
+    class BadFoundLine < Exception; end
 
     def parse(string)
       new_result do |result|
         string.lines.each do |line|
           case line
+          when /^(?:\w+)\. Unused/i
+            # ignore that
           when /^Block\.\s+(.*)$/
             result << found_block($1)
           when /^Item\.\s+(.*)$/
@@ -31,12 +36,16 @@ module Miwomi
     def found_block(line)
       if match = line.match(NameAndId)
         Block.new match[:id].to_i, match[:name]
+      else
+        raise BadFoundLine, line
       end
     end
 
     def found_item(line)
       if match = line.match(NameAndId)
         Item.new match[:id].to_i, match[:name]
+      else
+        raise BadFoundLine, line
       end
     end
 

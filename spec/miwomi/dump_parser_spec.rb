@@ -15,6 +15,10 @@ describe Miwomi::DumpParser do
       result.map(&:id).should == [256,257,258,259, 281]
     end
 
+    it 'ignores Unused things' do
+      subject.parse( UnusedDump ).should be_empty
+    end
+
     it 'complains about bad lines' do
       expect {
         subject.parse "Trololol. Game: lost\n"
@@ -42,4 +46,9 @@ Item. Name: item.pickaxeIron. ID: 257
 Item. Name: item.hatchetIron. ID: 258
 Item. Name: item.flintAndSteel. ID: 259
 Item. Name: item.bowl. ID: 281
+EODUMP
+
+UnusedDump = <<-EODUMP
+Block. Unused ID: 404
+Item. Unused ID: 4100
 EODUMP

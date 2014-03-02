@@ -8,6 +8,8 @@ module Miwomi
           case line
           when /^Block\.\s+(.*)$/
             result << $1
+          when /^Item\.\s+(.*)$/
+            result << $1
           else
             raise(BadLine, line)
           end

@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Miwomi
   class FileLandscape
     include RubyCraft
@@ -34,7 +36,7 @@ module Miwomi
         debug { "saving to #{copy}" }
         @region.exportToFile copy
         debug { "saved." }
-        File.mv copy, @region_path
+        FileUtils.mv copy, @region_path
         debug { "overwritten original #{@region_path}." }
       end
     end

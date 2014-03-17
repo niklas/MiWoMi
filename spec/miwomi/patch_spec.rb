@@ -1,21 +1,23 @@
 require 'miwomi/patch'
 
-RSpec::Matchers.define :translate_id do |from|
+RSpec::Matchers.define :translate_id do |from_id|
   match do |patch|
-    raise(ArgumentError, "please give a .to()") unless @to
-    @translation = patch.translations.find { |t| t.from == from }
-    @translation && @translation.to == @to
+    raise(ArgumentError, "please give a .to()") unless @to_id
+
+    patch.apply
+    @translation = patch.translations.find { |t| t.from.id == from_id }
+    @translation && @translation.to.id == @to_id
   end
 
-  chain :to do |to|
-    @to = to
+  chain :to do |to_id|
+    @to_id = to_id
   end
 
   failure_message_for_should do |patch|
     if @translation
-      "should translate #{from} to #{@to}, but targets #{@translation.to}"
+      "should translate #{from_id} to #{@to_id}, but did to #{@translation.to.id}"
     else
-      "could not find a translation for id: #{from}"
+      "could not find a translation for id: #{from_id}"
     end
   end
 end

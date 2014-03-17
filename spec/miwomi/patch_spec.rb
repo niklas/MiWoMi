@@ -69,7 +69,12 @@ describe Miwomi::Patch do
     it 'complains when translatiing block to id' do
       from << block(1, 'Stone')
       to   << item(2, 'Stone')
-      expect { subject.apply }.to raise_error
+      expect { subject.apply }.to raise_error(Miwomi::Patch::IncompatibeType)
+    end
+
+    it 'complains when a translation could not be found' do
+      from << block(1, 'Stone')
+      expect { subject.apply }.to raise_error(Miwomi::Patch::NoMatchFound)
     end
 
     it 'ignores vanilla technical blocks' do

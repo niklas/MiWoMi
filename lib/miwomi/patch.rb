@@ -2,6 +2,18 @@ module Miwomi
   class Patch < Struct.new(:from, :to)
     attr_reader :translations
 
+    class Error < RuntimeError
+    end
+
+    class NoMatchFound < Error
+      def message
+        "no match found for #{super}"
+      end
+    end
+
+    class IncompatibeType < Error
+    end
+
     class Translation < Struct.new(:from, :to)
     end
 
@@ -50,12 +62,12 @@ module Miwomi
         next if opts.ignore.any? { |ign| source.name.include?(ign) }
         if match = find_match(source)
           unless match.is_a?(source.class)
-            raise ArgumentError, "cannot translate #{source} into #{match}"
+            raise IncompatibeType, "cannot translate #{source} into #{match}"
           end
 
           @translations << Translation.new(source, match)
         else
-          raise "no match found for #{source}"
+          raise NoMatchFound, source
         end
       end
     end

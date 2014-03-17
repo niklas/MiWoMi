@@ -47,7 +47,12 @@ if __FILE__ == $0
   to   = Miwomi::Parser.parse_file to_file
 
   patch = Miwomi::Patch.new from, to
-  patch.apply(options)
+  begin
+    patch.apply(options)
 
-  $stdout.print patch.to_midas
+    $stdout.print patch.to_midas
+  rescue Miwomi::Patch::Error => e
+    $stderr.puts e.message
+    exit 2
+  end
 end

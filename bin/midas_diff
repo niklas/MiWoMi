@@ -2,28 +2,52 @@
 
 require File.expand_path '../../lib/miwomi', __FILE__
 
-def help
+def exit!(reason='', code=1)
   $stderr.puts <<-EOHELP
-  Usage: $0 FROM_FILE TO_FILE
+  #{reason}
+  try --help
   EOHELP
-end
-
-def help_and_exit
-  help
-  exit
+  exit code
 end
 
 if __FILE__ == $0
-  from_file = ARGV.shift || help_and_exit
-  to_file   = ARGV.shift || help_and_exit
+  options = Miwomi::Patch.default_opts
 
-  help_and_exit unless ARGV.empty?
+  option_parser = OptionParser.new do |opts|
+    opts.banner = "Usage: $0 FROM_FILE TO_FILE"
+
+    opts.separator ""
+    opts.separator "Specific options:"
+
+    opts.on '-i', '--ignore STRING',
+            "Ignore name including STRING",
+            "(for example eloraam.redpower)" do |v|
+      options.ignore << v
+    end
+
+    opts.separator ""
+    opts.separator "Common options:"
+
+    # No argument, shows at tail.  This will print an options summary.
+    # Try it and see!
+    opts.on_tail("-h", "--help", "Show this message") do
+      puts opts
+      exit
+    end
+  end
+
+  option_parser.parse!
+
+  from_file = ARGV.shift || exit!('could not find source file')
+  to_file   = ARGV.shift || exit!('could not find target file')
+
+  exit!("trailing filenames: #{ARGV.join(' ')}") unless ARGV.empty?
 
   from = Miwomi::Parser.parse_file from_file
   to   = Miwomi::Parser.parse_file to_file
 
   patch = Miwomi::Patch.new from, to
-  patch.apply
+  patch.apply(options)
 
   $stdout.print patch.to_midas
 end

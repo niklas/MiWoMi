@@ -36,10 +36,18 @@ module Miwomi
       150,  # Redstone Comparator
     ]
 
-    def apply
+    def self.default_opts
+      OpenStruct.new.tap do |options|
+        options.ignore  = []
+        options.verbose = false
+      end
+    end
+
+    def apply(opts=self.class.default_opts)
       @translations = []
       from.each do |source|
         next if TechnicalBlocks.include?(source.id)
+        next if opts.ignore.any? { |ign| source.name.include?(ign) }
         if match = find_match(source)
           unless match.is_a?(source.class)
             raise ArgumentError, "cannot translate #{source} into #{match}"

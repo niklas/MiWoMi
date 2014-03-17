@@ -77,6 +77,12 @@ describe Miwomi::Patch do
       to   << block(77,  'PistonHead')
       should_not translate_id(34).to(77)
     end
+
+    it 'ignores blocks by name from list' do
+      from << block(100, 'com.eloraam.redpower.world.BlockCustomCrops')
+      subject.apply double(ignore: ['eloraam.redpower'])
+      subject.translations.should be_empty
+    end
   end
 
   describe '#to_midas' do

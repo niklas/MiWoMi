@@ -51,6 +51,7 @@ module Miwomi
     def self.default_opts
       OpenStruct.new.tap do |options|
         options.ignore  = []
+        options.ignore_ids  = []
         options.verbose = false
       end
     end
@@ -60,6 +61,7 @@ module Miwomi
       from.each do |source|
         next if TechnicalBlocks.include?(source.id)
         next if opts.ignore.any? { |ign| source.name.include?(ign) }
+        next if opts.ignore_ids.include?(source.id)
         if match = find_match(source)
           unless match.is_a?(source.class)
             raise IncompatibeType, "cannot translate #{source} into #{match}"

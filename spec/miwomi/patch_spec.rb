@@ -83,9 +83,25 @@ describe Miwomi::Patch do
       should_not translate_id(34).to(77)
     end
 
+    def options(o)
+      described_class.default_opts.tap do |defaults|
+        o.each do |k,v|
+           defaults[k] = v
+        end
+      end
+    end
+
     it 'ignores blocks by name from list' do
       from << block(100, 'com.eloraam.redpower.world.BlockCustomCrops')
-      subject.apply double(ignore: ['eloraam.redpower'])
+      subject.apply options(ignore: ['eloraam.redpower'])
+      subject.translations.should be_empty
+    end
+
+    it 'ignores blocks by id' do
+      from << block(100, 'Fnords')
+      expect {
+        subject.apply options(ignore_ids: [23,100])
+      }.to_not raise_error
       subject.translations.should be_empty
     end
   end

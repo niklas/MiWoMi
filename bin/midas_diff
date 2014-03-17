@@ -25,6 +25,10 @@ if __FILE__ == $0
       options.ignore << v
     end
 
+    opts.on '-d', '--drop x,y,z', Array, "Ignore blocks/items by id" do |list|
+      options.ignore_ids = list.map(&:to_i)
+    end
+
     opts.separator ""
     opts.separator "Common options:"
 

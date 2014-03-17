@@ -48,11 +48,20 @@ describe Miwomi::Patch do
       Miwomi::Item.new(id, name)
     end
 
-    it 'detects blocks with exaclty matching name' do
+    it 'detects blocks with exactly matching name' do
       from << block(23, 'Stone')
       from << block(1,  'Dirt')
       to   << block(42, 'Stone')
       to   << block(2,  'Dirt')
+      should translate_id(23).to(42)
+      should translate_id(1).to(2)
+    end
+
+    it 'detects items with exactly matching name' do
+      from << item(23, 'Shovel')
+      from << item(1,  'Pickaxe')
+      to   << item(42, 'Shovel')
+      to   << item(2,  'Pickaxe')
       should translate_id(23).to(42)
       should translate_id(1).to(2)
     end

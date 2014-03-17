@@ -9,6 +9,10 @@ module Miwomi
   autoload :Block      , 'miwomi/block'
   autoload :Item       , 'miwomi/item'
   autoload :Patch      , 'miwomi/patch'
+
+  autoload :Parser     , 'miwomi/parser'
+  autoload :CsvParser  , 'miwomi/csv_parser'
+  autoload :DumpParser , 'miwomi/dump_parser'
   # Work in Progress
   autoload :FileLandscape, 'miwomi/file_landscape'
 end

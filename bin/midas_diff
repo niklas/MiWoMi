@@ -1,0 +1,29 @@
+#!/usr/bin/env ruby
+
+require File.expand_path '../../lib/miwomi', __FILE__
+
+def help
+  $stderr.puts <<-EOHELP
+  Usage: $0 FROM_FILE TO_FILE
+  EOHELP
+end
+
+def help_and_exit
+  help
+  exit
+end
+
+if __FILE__ == $0
+  from_file = ARGV.shift || help_and_exit
+  to_file   = ARGV.shift || help_and_exit
+
+  help_and_exit unless ARGV.empty?
+
+  from = Miwomi::Parser.parse_file from_file
+  to   = Miwomi::Parser.parse_file to_file
+
+  patch = Miwomi::Patch.new from, to
+  patch.apply
+
+  $stdout.print patch.to_midas
+end

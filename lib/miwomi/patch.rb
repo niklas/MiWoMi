@@ -11,6 +11,9 @@ module Miwomi
       end
     end
 
+    class AmbigousMatch < Error
+    end
+
     class IncompatibeType < Error
     end
 
@@ -76,7 +79,33 @@ module Miwomi
 
   private
     def find_match(source)
-      to.find { |t| t.name == source.name }
+      find_match_by_exact_name(source.name) ||
+        find_match_by_substrings(source.name)
+    end
+
+    def find_match_by_exact_name(name)
+      to.find { |t| t.name == name }
+    end
+
+    def find_match_by_substrings(name)
+      name.scan(/\w+/i).reverse.each do |substr|
+        found = to.select { |t| t.name.downcase.include?(substr.downcase) }
+
+        if found.length > 1
+          if found.length <13 
+            raise AmbigousMatch, "could not find fuzzy match for #{name.inspect} " +
+              "found #{found.length} possibilities: #{found.join("\n")}"
+          else
+            return nil # to many fuzzy matches, user should try something else
+          end
+        end
+
+        if found.length == 1
+          return found.first
+        end
+      end
+
+      nil # failed to find any candidate
     end
   end
 end

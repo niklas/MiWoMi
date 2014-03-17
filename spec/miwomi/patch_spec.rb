@@ -22,6 +22,26 @@ RSpec::Matchers.define :translate_id do |from_id|
   end
 end
 
+RSpec::Matchers.define :fail_translating do |from_id|
+  match do |patch|
+    raised = false
+    begin
+      patch.apply
+    rescue Miwomi::Patch::Error => e
+      raised = e
+    end
+
+    raised
+  end
+end
+
+RSpec::Matchers.define :translate_nothing do
+  match do |patch|
+    @translations = patch.translations
+    !@translations || @translations.empty?
+  end
+end
+
 describe Miwomi::Patch do
   describe '.new' do
     let(:from) { double 'FromCollection' }
@@ -66,6 +86,22 @@ describe Miwomi::Patch do
       should translate_id(1).to(2)
     end
 
+    it 'finds match by matching substrings' do
+      from << block(250, 'tile.oreCopper')
+      to << block(623, 'blockOreCopper')
+      to << block(2, 'tile.dirt')
+      to << block(3, 'tile.stone')
+      should translate_id(250).to(623)
+    end
+
+    it 'rejects ambigous match for substrings' do
+      from << block(250, 'tile.oreCopper')
+      to << block(1, 'tile.somethingElse')
+      to << block(3, 'tile.stone')
+
+      should fail_translating
+    end
+
     it 'complains when translatiing block to id' do
       from << block(1, 'Stone')
       to   << item(2, 'Stone')
@@ -94,7 +130,7 @@ describe Miwomi::Patch do
     it 'ignores blocks by name from list' do
       from << block(100, 'com.eloraam.redpower.world.BlockCustomCrops')
       subject.apply options(ignore: ['eloraam.redpower'])
-      subject.translations.should be_empty
+      should translate_nothing
     end
 
     it 'ignores blocks by id' do
@@ -102,7 +138,7 @@ describe Miwomi::Patch do
       expect {
         subject.apply options(ignore_ids: [23,100])
       }.to_not raise_error
-      subject.translations.should be_empty
+      should translate_nothing
     end
   end
 

@@ -71,6 +71,12 @@ describe Miwomi::Patch do
       to   << item(2, 'Stone')
       expect { subject.apply }.to raise_error
     end
+
+    it 'ignores vanilla technical blocks' do
+      from << block(34, 'PistonHead')
+      to   << block(77,  'PistonHead')
+      should_not translate_id(34).to(77)
+    end
   end
 
   describe '#to_midas' do

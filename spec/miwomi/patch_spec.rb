@@ -37,17 +37,20 @@ describe Miwomi::Patch do
   end
 
   describe '#apply' do
-    it 'can change a single Block id'
-    it 'can change a single Item id'
-    it 'complains when changing Block into Item'
-    it 'complains when changing Item into Block'
-    it 'can change 3 out of 7 needed ids'
-    it 'does not touch 4 out of 7 unchanged ids'
-    it 'can resolve chain of 2'
-    it 'can resolve chain of 3'
-    it 'can resolve chain of 7'
-    it 'can resolve swap (circle of 2)'
-    it 'can resolve circle of 3'
-    it 'can resolve circle of 7'
+    let(:from) { [] }
+    let(:to)   { [] }
+    subject { described_class.new from, to }
+    def block(id, name)
+      double "Block: #{name} (#{id})", id: id, name: name
+    end
+
+    it 'detects blocks with same name' do
+      from << block(23, 'Stone')
+      from << block(1,  'Dirt')
+      to   << block(42, 'Stone')
+      to   << block(2,  'Dirt')
+      should translate_id(23).to(42)
+      should translate_id(1).to(2)
+    end
   end
 end

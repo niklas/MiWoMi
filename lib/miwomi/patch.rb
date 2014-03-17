@@ -7,14 +7,22 @@ module Miwomi
 
     def apply
       @translations = []
-      from.each do |f|
-        match = to.find { |t| t.name == f.name }
-        if match
-          @translations << Translation.new(f, match)
+      from.each do |source|
+        if match = find_match(source)
+          unless match.is_a?(source.class)
+            raise ArgumentError, "cannot translate #{source} into #{match}"
+          end
+
+          @translations << Translation.new(source, match)
         else
-          raise "no match found for #{f}"
+          raise "no match found for #{source}"
         end
       end
+    end
+
+  private
+    def find_match(source)
+      to.find { |t| t.name == source.name }
     end
   end
 end

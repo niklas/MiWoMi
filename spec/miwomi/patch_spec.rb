@@ -1,4 +1,4 @@
-require 'miwomi/patch'
+require 'miwomi'
 
 RSpec::Matchers.define :translate_id do |from_id|
   match do |patch|
@@ -41,10 +41,14 @@ describe Miwomi::Patch do
     let(:to)   { [] }
     subject { described_class.new from, to }
     def block(id, name)
-      double "Block: #{name} (#{id})", id: id, name: name
+      Miwomi::Block.new(id, name)
     end
 
-    it 'detects blocks with same name' do
+    def item(id, name)
+      Miwomi::Item.new(id, name)
+    end
+
+    it 'detects blocks with exaclty matching name' do
       from << block(23, 'Stone')
       from << block(1,  'Dirt')
       to   << block(42, 'Stone')
@@ -52,5 +56,15 @@ describe Miwomi::Patch do
       should translate_id(23).to(42)
       should translate_id(1).to(2)
     end
+
+    it 'complains when translatiing block to id' do
+      from << block(1, 'Stone')
+      to   << item(2, 'Stone')
+      expect { subject.apply }.to raise_error
+    end
+  end
+
+  describe '#to_midas' do
+    it 'produces string used as a patch for mIDas gold'
   end
 end

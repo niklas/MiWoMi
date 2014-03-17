@@ -1,5 +1,25 @@
 require 'miwomi/patch'
 
+RSpec::Matchers.define :translate_id do |from|
+  match do |patch|
+    raise(ArgumentError, "please give a .to()") unless @to
+    @translation = patch.translations.find { |t| t.from == from }
+    @translation && @translation.to == @to
+  end
+
+  chain :to do |to|
+    @to = to
+  end
+
+  failure_message_for_should do |patch|
+    if @translation
+      "should translate #{from} to #{@to}, but targets #{@translation.to}"
+    else
+      "could not find a translation for id: #{from}"
+    end
+  end
+end
+
 describe Miwomi::Patch do
   describe '.new' do
     let(:from) { double 'FromCollection' }

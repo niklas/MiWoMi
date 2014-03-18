@@ -107,7 +107,10 @@ module Miwomi
         found = to.select { |t| t.name.downcase.include?(substr.downcase) }
 
         if found.length > 1
-          if found.length <13 
+          if exact = found.find { |f| f.id == source.id }
+            return exact
+          end
+          if found.length < 13
             raise AmbigousMatch, "could not find fuzzy match for #{source} " +
               "found #{found.length} possibilities:\n#{found.join("\n")}"
           else

@@ -86,20 +86,30 @@ describe Miwomi::Patch do
       should translate_id(1).to(2)
     end
 
-    it 'finds match by matching substrings' do
-      from << block(250, 'tile.oreCopper')
-      to << block(623, 'blockOreCopper')
-      to << block(2, 'tile.dirt')
-      to << block(3, 'tile.stone')
-      should translate_id(250).to(623)
-    end
+    describe 'substring matching' do
+      it 'finds simple match' do
+        from << block(250, 'tile.oreCopper')
+        to << block(623, 'blockOreCopper')
+        to << block(2, 'tile.dirt')
+        to << block(3, 'tile.stone')
+        should translate_id(250).to(623)
+      end
 
-    it 'rejects ambigous match for substrings' do
-      from << block(250, 'tile.oreCopper')
-      to << block(1, 'tile.somethingElse')
-      to << block(3, 'tile.stone')
+      it 'rejects ambigous match' do
+        from << block(250, 'tile.oreCopper')
+        to << block(1, 'tile.somethingElse')
+        to << block(3, 'tile.stone')
 
-      should fail_translating
+        should fail_translating
+      end
+
+      it 'resolves ambiguous match when one has fitting id' do
+        from << block(600, 'tile.blockAlloy')
+        to << block(600, 'blockAlloy')
+        to << block(601, 'blockAlloyGlass')
+
+        should translate_id(600).to(600)
+      end
     end
 
     describe 'NEI not dumping vanilla items by name' do

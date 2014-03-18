@@ -18,6 +18,9 @@ module Miwomi
     end
 
     class Translation < Struct.new(:from, :to)
+      def to_midas
+        %Q~# #{from.name} => #{to.name}\n#{from.id} -> #{to.id}~
+      end
     end
 
     # some blocks are internal, see http://minecraft.gamepedia.com/Technical_blocks
@@ -63,41 +66,50 @@ module Miwomi
       @translations = []
       from.each do |source|
         next if TechnicalBlocks.include?(source.id)
-        next if opts.ignore.any? { |ign| source.name.include?(ign) }
         next if opts.ignore_ids.include?(source.id)
+        next if opts.ignore.any? { |ign| source.name.include?(ign) }
+        if to.find { |t| t.id == source.id && t.name == 'tile.ForgeFiller' }
+          next # NEI.csv does not drop vanilla items by name
+        end
         if match = find_match(source)
           unless match.is_a?(source.class)
             raise IncompatibeType, "cannot translate #{source} into #{match}"
           end
 
-          @translations << Translation.new(source, match)
+          found_translation(source, match)
         else
-          if to.find { |t| t.id == source.id && t.name = 'tile.ForgeFiller' }
-            next # NEI.csv does not drop vanilla items by name
-          end
           raise NoMatchFound, source
         end
       end
     end
 
   private
+    def found_translation(source, match)
+      translation = Translation.new(source, match)
+      if true
+        $stderr.puts translation.to_midas
+      end
+      @translations << translation
+    end
     def find_match(source)
-      find_match_by_exact_name(source.name) ||
-        find_match_by_substrings(source.name)
+      find_match_by_exact_name(source) ||
+        find_match_by_substrings(source)
     end
 
-    def find_match_by_exact_name(name)
+    def find_match_by_exact_name(source)
+      name = source.name
       to.find { |t| t.name == name }
     end
 
-    def find_match_by_substrings(name)
+    def find_match_by_substrings(source)
+      name = source.name
       name.scan(/\w+/i).reverse.each do |substr|
         found = to.select { |t| t.name.downcase.include?(substr.downcase) }
 
         if found.length > 1
           if found.length <13 
-            raise AmbigousMatch, "could not find fuzzy match for #{name.inspect} " +
-              "found #{found.length} possibilities: #{found.join("\n")}"
+            raise AmbigousMatch, "could not find fuzzy match for #{source} " +
+              "found #{found.length} possibilities:\n#{found.join("\n")}"
           else
             return nil # to many fuzzy matches, user should try something else
           end

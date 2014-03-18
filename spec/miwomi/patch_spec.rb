@@ -103,11 +103,17 @@ describe Miwomi::Patch do
     end
 
     describe 'NEI not dumping vanilla items by name' do
-      before :each do
-        from << item(256, 'item.shovelIron')
-      end
       it 'skips item when lookes like badly dropped' do
+        from << item(256, 'item.shovelIron')
         to << block(256, 'tile.ForgeFiller')
+        should translate_nothing
+      end
+
+      it 'skips item even if there are substring alternatives' do
+        from << item(256, 'item.apple')
+        to << block(256, 'tile.ForgeFiller')
+        to << block(13795, 'item.cratedApples')
+        to << block(14363, 'item.tconstruct.apple.diamond')
         should translate_nothing
       end
     end

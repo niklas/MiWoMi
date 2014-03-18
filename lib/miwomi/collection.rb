@@ -10,12 +10,12 @@ module Miwomi
       find { |x| x.id == want }
     end
 
-    def add_thing(typ, id, name)
+    def add_thing(typ, *a)
       case typ.downcase
       when 'block'
-        self << Block.new(id, name)
+        self << Block.new(*a)
       when 'item'
-        self << Item.new(id, name)
+        self << Item.new(*a)
       else
         raise BadType, typ
       end

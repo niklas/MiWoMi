@@ -18,7 +18,7 @@ module Miwomi
           when 'null'
             # ignore that
           when /^Block|Item$/
-           result.add_thing row[:blockitem], row[:id].to_i, row[:unlocalised_name]
+           result.add_thing row[:blockitem], row[:id].to_i, row[:unlocalised_name], row[:class]
           else
             raise BadThing, row
           end

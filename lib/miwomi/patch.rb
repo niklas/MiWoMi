@@ -93,7 +93,8 @@ module Miwomi
     end
     def find_match(source)
       find_match_by_exact_name(source) ||
-        find_match_by_substrings(source)
+        find_match_by_substrings(source, :klass) ||
+        find_match_by_substrings(source, :name)
     end
 
     def find_match_by_exact_name(source)
@@ -101,10 +102,15 @@ module Miwomi
       to.find { |t| t.name == name }
     end
 
-    def find_match_by_substrings(source)
+    def find_match_by_substrings(source, target_attr=:name)
       name = source.name
       name.scan(/\w+/i).reverse.each do |substr|
-        found = to.select { |t| t.name.downcase.include?(substr.downcase) }
+        next if substr == 'tile'
+        found = to.select do |t|
+          if val = t.public_send(target_attr)
+            val.downcase.include?(substr.downcase)
+          end
+        end
 
         if found.length > 1
           if exact = found.find { |f| f.id == source.id }

@@ -72,6 +72,9 @@ module Miwomi
 
           @translations << Translation.new(source, match)
         else
+          if to.find { |t| t.id == source.id && t.name = 'tile.ForgeFiller' }
+            next # NEI.csv does not drop vanilla items by name
+          end
           raise NoMatchFound, source
         end
       end

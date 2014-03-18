@@ -37,8 +37,8 @@ end
 
 RSpec::Matchers.define :translate_nothing do
   match do |patch|
-    @translations = patch.translations
-    !@translations || @translations.empty?
+    patch.apply if patch.translations.nil?
+    patch.translations.empty?
   end
 end
 
@@ -100,6 +100,16 @@ describe Miwomi::Patch do
       to << block(3, 'tile.stone')
 
       should fail_translating
+    end
+
+    describe 'NEI not dumping vanilla items by name' do
+      before :each do
+        from << item(256, 'item.shovelIron')
+      end
+      it 'skips item when lookes like badly dropped' do
+        to << block(256, 'tile.ForgeFiller')
+        should translate_nothing
+      end
     end
 
     it 'complains when translatiing block to id' do

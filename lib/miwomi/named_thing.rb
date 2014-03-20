@@ -15,7 +15,9 @@ module Miwomi
     end
 
     def to_s
-      %Q~<#{short_class_name} #{name.inspect} (#{id})>~
+      k = klass.to_s
+      k = " [#{k}]" unless k.empty?
+      %Q~<#{short_class_name} #{name.inspect} (#{id})#{k}>~
     end
 
     def short_class_name

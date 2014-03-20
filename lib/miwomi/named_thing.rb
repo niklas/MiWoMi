@@ -23,6 +23,10 @@ module Miwomi
     def short_class_name
       self.class.name.split(':').last
     end
+
+    def <=>(other)
+      id <=> other.id
+    end
   end
 end
 

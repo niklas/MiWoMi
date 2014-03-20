@@ -6,9 +6,6 @@ module Miwomi
     end
 
     class NoMatchFound < Error
-      def message
-        "no match found for #{super}"
-      end
     end
 
     class AmbigousMatch < Error
@@ -78,9 +75,13 @@ module Miwomi
 
           found_translation(source, match)
         else
-          raise NoMatchFound, source
+          raise NoMatchFound, "no match found for #{source}, tried #{@tried.join(', ')}"
         end
       end
+    end
+
+    def to_s
+      %Q~<#{self.class} from #{from.length} to #{to.length} things>~
     end
 
   private
@@ -91,45 +92,85 @@ module Miwomi
       end
       @translations << translation
     end
+
+    def finders
+      @finders = [].tap do |finders|
+        #finders << lambda {|s| find_match_by_same_id s }
+        finders << [:exact_name,         lambda {|s| find_match_by_exact_name s } ]
+        finders << [:word_of_klass,      lambda {|s| find_match_by_word(s, :klass) } ]
+        finders << [:word_of_name,       lambda {|s| find_match_by_word(s, :name) } ]
+        finders << [:substring_of_klass, lambda {|s| find_match_by_substring(s, :klass) } ]
+        finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s, :name) } ]
+      end
+    end
+
     def find_match(source)
-      find_match_by_exact_name(source) ||
-        find_match_by_substrings(source, :klass) ||
-        find_match_by_substrings(source, :name)
+      @tried = []
+      found = finders.map do |finder_name,finder|
+        @tried << finder_name
+        result = finder[source]
+        unless result
+          raise "finder did return nil, should return at least empty array: #{finder}"
+        end
+        if result.length == 1
+          return result.first
+        # matching in some way AND the id is the same? looks like we found it
+        elsif exact = result.find { |f| f.id == source.id }
+          return exact
+        else
+          result
+        end
+      end.flatten.compact.sort.uniq
+
+
+      if 1 < found.length && found.length < 13
+        raise AmbigousMatch, "could not find fuzzy match for #{source} " +
+          "found #{found.length} possibilities:\n#{found.join("\n")}"
+      end
+      nil
+    end
+
+    def find_match_by_same_id(source)
+      []
     end
 
     def find_match_by_exact_name(source)
-      name = source.name
-      to.find { |t| t.name == name }
+      to.select { |t| t.name == source.name }
     end
 
-    def find_match_by_substrings(source, target_attr=:name)
+    def find_match_by_word(source, attr=:name)
+      name = source.name
+      name.scan(/\w+/i).reverse.each do |substr|
+        next if substr == 'tile'
+        exp = /\b#{substr}\b/i
+        found = to.select do |t|
+          if val = t.public_send(attr)
+            val =~ exp
+          end
+        end
+        if found.length == 1
+          return found
+        end
+      end
+
+      [] # failed to find any candidates
+    end
+
+    def find_match_by_substring(source, attr=:name)
       name = source.name
       name.scan(/\w+/i).reverse.each do |substr|
         next if substr == 'tile'
         found = to.select do |t|
-          if val = t.public_send(target_attr)
+          if val = t.public_send(attr)
             val.downcase.include?(substr.downcase)
           end
         end
-
-        if found.length > 1
-          if exact = found.find { |f| f.id == source.id }
-            return exact
-          end
-          if found.length < 13
-            raise AmbigousMatch, "could not find fuzzy match for #{source} " +
-              "found #{found.length} possibilities:\n#{found.join("\n")}"
-          else
-            return nil # to many fuzzy matches, user should try something else
-          end
-        end
-
-        if found.length == 1
-          return found.first
+        unless found.empty?
+          return found
         end
       end
 
-      nil # failed to find any candidate
+      [] # failed to find any candidates
     end
   end
 end

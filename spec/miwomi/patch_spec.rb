@@ -77,6 +77,13 @@ describe Miwomi::Patch do
       should translate_id(1).to(2)
     end
 
+    it 'detects block with matching name ignoring case' do
+      from << block(23, 'tile.BlockDetector')
+      to   << block(42, 'tile.blockDetector')
+      to   << block(666, 'tile.another.blockDetector')
+      should translate_id(23).to(42)
+    end
+
     it 'detects items with exactly matching name' do
       from << item(23, 'Shovel')
       from << item(1,  'Pickaxe')

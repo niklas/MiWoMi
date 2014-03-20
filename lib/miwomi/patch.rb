@@ -75,7 +75,7 @@ module Miwomi
 
           found_translation(source, match)
         else
-          raise NoMatchFound, "no match found for #{source}, tried #{@tried.join(', ')}"
+          raise NoMatchFound, "no match found for #{source}, tried #{tries}"
         end
       end
     end
@@ -97,10 +97,19 @@ module Miwomi
       @finders = [].tap do |finders|
         #finders << lambda {|s| find_match_by_same_id s }
         finders << [:exact_name,         lambda {|s| find_match_by_exact_name s } ]
+        finders << [:case_ins_name,      lambda {|s| find_match_by_case_insensitive_name s } ]
         finders << [:word_of_klass,      lambda {|s| find_match_by_word(s, :klass) } ]
         finders << [:word_of_name,       lambda {|s| find_match_by_word(s, :name) } ]
         finders << [:substring_of_klass, lambda {|s| find_match_by_substring(s, :klass) } ]
         finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s, :name) } ]
+      end
+    end
+
+    def tries
+      if @tried.empty?
+        'nothing'
+      else
+        @tried.join(', ')
       end
     end
 
@@ -125,7 +134,8 @@ module Miwomi
 
       if 1 < found.length && found.length < 13
         raise AmbigousMatch, "could not find fuzzy match for #{source} " +
-          "found #{found.length} possibilities:\n#{found.join("\n")}"
+          "\ntried #{tries}" +
+          "\nfound #{found.length} possibilities:\n#{found.join("\n")}"
       end
       nil
     end
@@ -136,6 +146,11 @@ module Miwomi
 
     def find_match_by_exact_name(source)
       to.select { |t| t.name == source.name }
+    end
+
+    def find_match_by_case_insensitive_name(source)
+      name = source.name.downcase
+      to.select { |t| t.name.downcase == name }
     end
 
     def find_match_by_word(source, attr=:name)

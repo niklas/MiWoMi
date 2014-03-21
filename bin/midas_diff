@@ -20,10 +20,12 @@ if __FILE__ == $0
     opts.separator "Specific options:"
 
     opts.on '-d', '--drop x,y,z',
-      "Ignore blocks/items where x is an id, id range or substring",
+      "Drop blocks/items where x is an id, id range or substring",
       "  -d 4,8,15,16,23,42",
       "  -d 23-42",
-      "  -d eloraam.redpoweer",
+      "  -d eloraam.redpower",
+      "  -d 666,number.beast,6-66",
+      "  they will vanish into thin air",
       Array do |list|
       list.each do |item|
         case item

@@ -19,14 +19,24 @@ if __FILE__ == $0
     opts.separator ""
     opts.separator "Specific options:"
 
-    opts.on '-i', '--ignore STRING',
-            "Ignore name including STRING",
-            "(for example eloraam.redpower)" do |v|
-      options.ignore << v
-    end
-
-    opts.on '-d', '--drop x,y,z', Array, "Ignore blocks/items by id" do |list|
-      options.ignore_ids = list.map(&:to_i)
+    opts.on '-d', '--drop x,y,z',
+      "Ignore blocks/items where x is an id, id range or substring",
+      "  -d 4,8,15,16,23,42",
+      "  -d 23-42",
+      "  -d eloraam.redpoweer",
+      Array do |list|
+      list.each do |item|
+        case item
+        when /^\d+$/
+          options.ignore_ids << item.to_i
+        when /^(\d+)-(\d+)$/
+          $1.to_i.upto($2.to_i) do |i|
+            options.ignore_ids << i
+          end
+        else
+          options.ignore << item
+        end
+      end
     end
 
     opts.separator ""

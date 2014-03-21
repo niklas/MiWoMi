@@ -192,4 +192,16 @@ describe Miwomi::Patch do
       subject.to_midas.should == "AA\nBB\nCC"
     end
   end
+
+  describe '#output_filename' do
+    it 'is generated automatically' do
+      subject.stub from: %w(bar), to: %w(foo)
+      subject.output_filename.should =~ /^\w{40}\.midas$/
+    end
+    it 'can be specified' do
+      name = 'exactly_here.mamamidas'
+      options.output_filename = name
+      subject.output_filename.should == name
+    end
+  end
 end

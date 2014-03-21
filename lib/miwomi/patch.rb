@@ -1,3 +1,5 @@
+require 'digest/sha1'
+
 module Miwomi
   class Patch
     attr_reader :translations
@@ -66,6 +68,7 @@ module Miwomi
         options.alternatives = []
         options.verbose = false
         options.progressbar = false
+        options.output_filename = nil
       end
     end
 
@@ -93,12 +96,25 @@ module Miwomi
       progressbar.stop if options.progressbar
     end
 
+    def apply_and_write
+      apply
+      file = output_filename
+      File.open file, 'w' do |f|
+        f.print to_midas
+      end
+      $stderr.puts "written to #{file}"
+    end
+
     def to_s
       %Q~<#{self.class} from #{from.length} to #{to.length} things>~
     end
 
     def to_midas
       translations.map(&:to_midas).join("\n")
+    end
+
+    def output_filename
+      options[:output_filename] || output_filename_from_collections
     end
 
   private
@@ -225,6 +241,11 @@ module Miwomi
 
     def progressbar
       @progressbar ||= ProgressBar.create title: 'mining..', total: from.length, format: "%t %p%%: |%B|"
+    end
+
+    def output_filename_from_collections
+      hash = Digest::SHA1.hexdigest from.inspect + to.inspect + options.inspect
+      "#{hash}.midas"
     end
   end
 end

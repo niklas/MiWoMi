@@ -30,13 +30,13 @@ if __FILE__ == $0
       list.each do |item|
         case item
         when /^\d+$/
-          options.ignore_ids << item.to_i
+          options.drop_ids << item.to_i
         when /^(\d+)-(\d+)$/
           $1.to_i.upto($2.to_i) do |i|
-            options.ignore_ids << i
+            options.drop_ids << i
           end
         else
-          options.ignore << item
+          options.drop << item
         end
       end
     end

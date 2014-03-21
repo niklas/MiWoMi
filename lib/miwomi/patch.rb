@@ -63,8 +63,8 @@ module Miwomi
 
     def self.default_opts
       OpenStruct.new.tap do |options|
-        options.ignore  = []
-        options.ignore_ids  = []
+        options.drop  = []
+        options.drop_ids  = []
         options.alternatives = []
         options.verbose = false
         options.progressbar = false
@@ -77,8 +77,8 @@ module Miwomi
       from.each do |source|
         progressbar.increment if options.progressbar
         next if TechnicalBlocks.include?(source.id)
-        next if options.ignore_ids.include?(source.id)
-        next if options.ignore.any? { |ign| source.name.include?(ign) }
+        drop(source) && next if options.drop_ids.include?(source.id)
+        drop(source) && next if options.drop.any? { |ign| source.name.include?(ign) }
         if to.find { |t| t.id == source.id && t.name == 'tile.ForgeFiller' }
           next # NEI.csv does not drop vanilla items by name
         end
@@ -128,6 +128,10 @@ module Miwomi
         $stderr.puts translation.to_midas
       end
       @translations << translation
+    end
+
+    def drop(source)
+      found_translation source, source.class.new( 0, "dropped")
     end
 
     def finders

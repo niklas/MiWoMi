@@ -175,17 +175,17 @@ describe Miwomi::Patch do
       should_not translate_id(34).to(77)
     end
 
-    it 'ignores blocks by name from list' do
+    it 'drops blocks by name from list' do
       from << block(100, 'com.eloraam.redpower.world.BlockCustomCrops')
-      options.ignore = ['eloraam.redpower']
-      should translate_nothing
+      options.drop = ['eloraam.redpower']
+      should translate_id(100).to(0)
     end
 
-    it 'ignores blocks by id' do
+    it 'drops blocks by id' do
       from << block(100, 'Fnords')
-      options.ignore_ids = [23,100]
+      options.drop_ids = [23,100]
       expect { subject }.to_not raise_error
-      should translate_nothing
+      should translate_id(100).to(0)
     end
   end
 

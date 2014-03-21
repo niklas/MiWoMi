@@ -97,6 +97,10 @@ module Miwomi
       %Q~<#{self.class} from #{from.length} to #{to.length} things>~
     end
 
+    def to_midas
+      translations.map(&:to_midas).join("\n")
+    end
+
   private
     def found_translation(source, match)
       translation = Translation.new(source, match)

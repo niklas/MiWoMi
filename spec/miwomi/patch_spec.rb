@@ -45,11 +45,10 @@ end
 describe Miwomi::Patch do
   let(:options) { described_class.default_opts }
   subject { described_class.new from, to, options }
+  let(:from) { double 'FromCollection' }
+  let(:to)   { double 'ToCollection' }
 
   describe '.new' do
-    let(:from) { double 'FromCollection' }
-    let(:to)   { double 'ToCollection' }
-
     it 'takes two collections and options' do
       expect { subject }.not_to raise_error
 
@@ -185,6 +184,12 @@ describe Miwomi::Patch do
   end
 
   describe '#to_midas' do
-    it 'produces string used as a patch for mIDas gold'
+    it 'produces string used as a patch for mIDas gold' do
+      a = double 'Translation A', to_midas: 'AA'
+      b = double 'Translation B', to_midas: 'BB'
+      c = double 'Translation C', to_midas: 'CC'
+      subject.stub translations: [a,b,c]
+      subject.to_midas.should == "AA\nBB\nCC"
+    end
   end
 end

@@ -41,6 +41,22 @@ if __FILE__ == $0
       end
     end
 
+   opts.on '-a', '--alternative foo/bar,bam/baz',
+     "try an alternative if first name does not yield match (renamed plugins)",
+     "  if 'foo' is not found, it is replaced by 'bar'",
+     "  -a rc.liquid/railcraft.fluid",
+     Array do |list|
+       list.each do |item|
+         pair = item.split('/')[0..1]
+         if pair.length == 2
+           options.alternatives << pair
+         else
+           raise "must give alternative like so: -a original/alternative"
+         end
+       end
+   end
+
+
     opts.separator ""
     opts.separator "Common options:"
 

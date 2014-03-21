@@ -72,29 +72,43 @@ describe Miwomi::Patch do
       Miwomi::Item.new(id, name)
     end
 
-    it 'detects blocks with exactly matching name' do
-      from << block(23, 'Stone')
-      from << block(1,  'Dirt')
-      to   << block(42, 'Stone')
-      to   << block(2,  'Dirt')
-      should translate_id(23).to(42)
-      should translate_id(1).to(2)
-    end
+    describe 'exact name matching' do
+      it 'detects blocks with exactly matching name' do
+        from << block(23, 'Stone')
+        from << block(1,  'Dirt')
+        to   << block(42, 'Stone')
+        to   << block(2,  'Dirt')
+        should translate_id(23).to(42)
+        should translate_id(1).to(2)
+      end
 
-    it 'detects block with matching name ignoring case' do
-      from << block(23, 'tile.BlockDetector')
-      to   << block(42, 'tile.blockDetector')
-      to   << block(666, 'tile.another.blockDetector')
-      should translate_id(23).to(42)
-    end
+      it 'detects block with matching name ignoring case' do
+        from << block(23, 'tile.BlockDetector')
+        to   << block(42, 'tile.blockDetector')
+        to   << block(666, 'tile.another.blockDetector')
+        should translate_id(23).to(42)
+      end
 
-    it 'detects items with exactly matching name' do
-      from << item(23, 'Shovel')
-      from << item(1,  'Pickaxe')
-      to   << item(42, 'Shovel')
-      to   << item(2,  'Pickaxe')
-      should translate_id(23).to(42)
-      should translate_id(1).to(2)
+      it 'detects items with exactly matching name' do
+        from << item(23, 'Shovel')
+        from << item(1,  'Pickaxe')
+        to   << item(42, 'Shovel')
+        to   << item(2,  'Pickaxe')
+        should translate_id(23).to(42)
+        should translate_id(1).to(2)
+      end
+
+      describe 'given alternatives' do
+        it 'detects items with renamed i18n scopes' do
+          options.alternatives << ['rc.liquid', 'railcraft.fluid']
+          from << item(7770, 'item.rc.liquid.creosote.bottle')
+
+          to   << item(7783, 'item.railcraft.fluid.creosote.bottle')
+          to   << item(7789, 'item.railcraft.fluid.steam.bottle')
+          to   << item(7784, 'item.railcraft.fluid.creosote.bucket')
+          should translate_id(7770).to(7783)
+        end
+      end
     end
 
     describe 'substring matching' do

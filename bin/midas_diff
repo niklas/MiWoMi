@@ -62,9 +62,9 @@ if __FILE__ == $0
   from = Miwomi::Parser.parse_file from_file
   to   = Miwomi::Parser.parse_file to_file
 
-  patch = Miwomi::Patch.new from, to
+  patch = Miwomi::Patch.new from, to, options
   begin
-    patch.apply(options)
+    patch.apply
 
     $stdout.print patch.to_midas
   rescue Miwomi::Patch::Error => e

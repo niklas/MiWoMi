@@ -1,6 +1,14 @@
 module Miwomi
-  class Patch < Struct.new(:from, :to)
+  class Patch
     attr_reader :translations
+    attr_reader :from, :to
+    attr_reader :options
+
+    def initialize(from, to, options=self.class.default_opts)
+      @from    = from
+      @to      = to
+      @options = options
+    end
 
     class Error < RuntimeError
     end
@@ -55,16 +63,17 @@ module Miwomi
       OpenStruct.new.tap do |options|
         options.ignore  = []
         options.ignore_ids  = []
+        options.alternatives = []
         options.verbose = false
       end
     end
 
-    def apply(opts=self.class.default_opts)
+    def apply
       @translations = []
       from.each do |source|
         next if TechnicalBlocks.include?(source.id)
-        next if opts.ignore_ids.include?(source.id)
-        next if opts.ignore.any? { |ign| source.name.include?(ign) }
+        next if options.ignore_ids.include?(source.id)
+        next if options.ignore.any? { |ign| source.name.include?(ign) }
         if to.find { |t| t.id == source.id && t.name == 'tile.ForgeFiller' }
           next # NEI.csv does not drop vanilla items by name
         end

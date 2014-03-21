@@ -37,29 +37,33 @@ end
 
 RSpec::Matchers.define :translate_nothing do
   match do |patch|
-    patch.apply if patch.translations.nil?
+    patch.apply
     patch.translations.empty?
   end
 end
 
 describe Miwomi::Patch do
+  let(:options) { described_class.default_opts }
+  subject { described_class.new from, to, options }
+
   describe '.new' do
     let(:from) { double 'FromCollection' }
     let(:to)   { double 'ToCollection' }
-    subject { described_class.new from, to }
 
-    it 'takes two collections' do
+    it 'takes two collections and options' do
       expect { subject }.not_to raise_error
 
       subject.from.should == from
       subject.to.should == to
+      subject.options.should == options
     end
+
+    it 'has optional options'
   end
 
   describe '#apply' do
     let(:from) { Miwomi::Collection.new }
     let(:to)   { Miwomi::Collection.new }
-    subject { described_class.new from, to }
     def block(id, name)
       Miwomi::Block.new(id, name)
     end
@@ -138,12 +142,12 @@ describe Miwomi::Patch do
     it 'does not try to translate block to item' do
       from << block(1, 'Stone')
       to   << item(2, 'Stone')
-      expect { subject.apply }.to raise_error(Miwomi::Patch::NoMatchFound)
+      should fail_translating
     end
 
     it 'complains when a translation could not be found' do
       from << block(1, 'Stone')
-      expect { subject.apply }.to raise_error(Miwomi::Patch::NoMatchFound)
+      should fail_translating
     end
 
     it 'ignores vanilla technical blocks' do
@@ -152,25 +156,16 @@ describe Miwomi::Patch do
       should_not translate_id(34).to(77)
     end
 
-    def options(o)
-      described_class.default_opts.tap do |defaults|
-        o.each do |k,v|
-           defaults[k] = v
-        end
-      end
-    end
-
     it 'ignores blocks by name from list' do
       from << block(100, 'com.eloraam.redpower.world.BlockCustomCrops')
-      subject.apply options(ignore: ['eloraam.redpower'])
+      options.ignore = ['eloraam.redpower']
       should translate_nothing
     end
 
     it 'ignores blocks by id' do
       from << block(100, 'Fnords')
-      expect {
-        subject.apply options(ignore_ids: [23,100])
-      }.to_not raise_error
+      options.ignore_ids = [23,100]
+      expect { subject }.to_not raise_error
       should translate_nothing
     end
   end

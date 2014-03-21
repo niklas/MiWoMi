@@ -136,6 +136,12 @@ describe Miwomi::Patch do
       end
     end
 
+    it 'does not mention keeps' do
+      from << block(1, 'Stone')
+      to << block(1, 'Stone')
+      should translate_nothing
+    end
+
     describe 'NEI not dumping vanilla items by name' do
       it 'skips item when lookes like badly dropped' do
         from << item(256, 'item.shovelIron')

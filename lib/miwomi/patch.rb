@@ -87,6 +87,10 @@ module Miwomi
             raise IncompatibeType, "cannot translate #{source} into #{match}"
           end
 
+          if source == match
+            next
+          end
+
           found_translation(source, match)
         else
           raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}"

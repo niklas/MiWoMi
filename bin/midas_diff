@@ -14,7 +14,7 @@ if __FILE__ == $0
   options = Miwomi::Patch.default_opts
 
   option_parser = OptionParser.new do |opts|
-    opts.banner = "Usage: $0 FROM_FILE TO_FILE"
+    opts.banner = "Usage: #{$0} FROM_FILE TO_FILE"
 
     opts.separator ""
     opts.separator "Specific options:"

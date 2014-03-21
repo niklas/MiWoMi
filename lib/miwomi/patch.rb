@@ -119,10 +119,15 @@ module Miwomi
       if @tried.empty?
         'nothing'
       else
+        indent = lambda { |f| "    #{f}" }
         @tried.map do |name, found|
-          [
-            "  #{name}:"
-          ] + found.map { |f| "    #{f}" }
+          [ "  #{name}:" ] +
+          if found.length > 7
+            found[0..6].map(&indent) +
+              [ indent["... and #{found.length - 7} more"] ]
+          else
+            found.map(&indent)
+          end
         end.flatten.join("\n")
       end
     end

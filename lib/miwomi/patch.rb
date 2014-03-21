@@ -65,12 +65,14 @@ module Miwomi
         options.ignore_ids  = []
         options.alternatives = []
         options.verbose = false
+        options.progressbar = false
       end
     end
 
     def apply
       @translations = []
       from.each do |source|
+        progressbar.increment if options.progressbar
         next if TechnicalBlocks.include?(source.id)
         next if options.ignore_ids.include?(source.id)
         next if options.ignore.any? { |ign| source.name.include?(ign) }
@@ -87,6 +89,8 @@ module Miwomi
           raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}"
         end
       end
+    ensure
+      progressbar.stop if options.progressbar
     end
 
     def to_s
@@ -96,7 +100,7 @@ module Miwomi
   private
     def found_translation(source, match)
       translation = Translation.new(source, match)
-      if true
+      if options.verbose
         $stderr.puts translation.to_midas
       end
       @translations << translation
@@ -213,6 +217,10 @@ module Miwomi
         end
         found.length < 8 ? found : []
       end.flatten.compact.uniq
+    end
+
+    def progressbar
+      @progressbar ||= ProgressBar.create title: 'mining..', total: from.length, format: "%t %p%%: |%B|"
     end
   end
 end

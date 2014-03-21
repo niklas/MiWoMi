@@ -56,6 +56,10 @@ if __FILE__ == $0
        end
    end
 
+   opts.on '-P', '--[no-]progress', "show progress bar" do |v|
+     options.progressbar = v
+   end
+
 
     opts.separator ""
     opts.separator "Common options:"

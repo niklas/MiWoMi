@@ -84,7 +84,7 @@ module Miwomi
 
           found_translation(source, match)
         else
-          raise NoMatchFound, "no match found for #{source}, tried #{tries}"
+          raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}"
         end
       end
     end
@@ -118,18 +118,22 @@ module Miwomi
       if @tried.empty?
         'nothing'
       else
-        @tried.join(', ')
+        @tried.map do |name, found|
+          [
+            "  #{name}:"
+          ] + found.map { |f| "    #{f}" }
+        end.flatten.join("\n")
       end
     end
 
     def find_match(source)
-      @tried = []
+      @tried = {}
       found = finders.map do |finder_name,finder|
-        @tried << finder_name
         result = finder[source]
         unless result
           raise "finder did return nil, should return at least empty array: #{finder}"
         end
+        @tried[finder_name] = result
         if result.length == 1
           return result.first
         # matching in some way AND the id is the same? looks like we found it
@@ -143,7 +147,7 @@ module Miwomi
 
       if 1 < found.length && found.length < 13
         raise AmbigousMatch, "could not find fuzzy match for #{source} " +
-          "\ntried #{tries}" +
+          "\ntried:\n#{tries}" +
           "\nfound #{found.length} possibilities:\n#{found.join("\n")}"
       end
       nil
@@ -164,7 +168,7 @@ module Miwomi
 
     def find_match_by_word(source, attr=:name)
       name = source.name
-      name.scan(/\w+/i).reverse.each do |substr|
+      name.scan(/\w+/i).reverse.map do |substr|
         next if substr == 'tile'
         exp = /\b#{substr}\b/i
         found = to.of_type(source).select do |t|
@@ -175,14 +179,13 @@ module Miwomi
         if found.length == 1
           return found
         end
-      end
-
-      [] # failed to find any candidates
+        found.length < 8 ? found : []
+      end.flatten.compact.uniq
     end
 
     def find_match_by_substring(source, attr=:name)
       name = source.name
-      name.scan(/\w+/i).reverse.each do |substr|
+      name.scan(/\w+/i).reverse.map do |substr|
         next if substr == 'tile'
         found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
@@ -192,9 +195,8 @@ module Miwomi
         unless found.empty?
           return found
         end
-      end
-
-      [] # failed to find any candidates
+        found.length < 8 ? found : []
+      end.flatten.compact.uniq
     end
   end
 end

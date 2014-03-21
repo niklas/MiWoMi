@@ -57,8 +57,8 @@ describe Miwomi::Patch do
   end
 
   describe '#apply' do
-    let(:from) { [] }
-    let(:to)   { [] }
+    let(:from) { Miwomi::Collection.new }
+    let(:to)   { Miwomi::Collection.new }
     subject { described_class.new from, to }
     def block(id, name)
       Miwomi::Block.new(id, name)
@@ -135,10 +135,10 @@ describe Miwomi::Patch do
       end
     end
 
-    it 'complains when translatiing block to id' do
+    it 'does not try to translate block to item' do
       from << block(1, 'Stone')
       to   << item(2, 'Stone')
-      expect { subject.apply }.to raise_error(Miwomi::Patch::IncompatibeType)
+      expect { subject.apply }.to raise_error(Miwomi::Patch::NoMatchFound)
     end
 
     it 'complains when a translation could not be found' do

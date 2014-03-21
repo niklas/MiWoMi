@@ -10,6 +10,8 @@ module Miwomi
   autoload :Item       , 'miwomi/item'
   autoload :Patch      , 'miwomi/patch'
 
+  autoload :Collection , 'miwomi/collection'
+
   autoload :Parser     , 'miwomi/parser'
   autoload :CsvParser  , 'miwomi/csv_parser'
   autoload :DumpParser , 'miwomi/dump_parser'

@@ -21,5 +21,9 @@ module Miwomi
       end
     end
 
+    def of_type(other)
+      select { |i| i.is_a?(other.class) }
+    end
+
   end
 end

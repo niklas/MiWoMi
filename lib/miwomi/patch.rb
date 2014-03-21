@@ -145,12 +145,12 @@ module Miwomi
     end
 
     def find_match_by_exact_name(source)
-      to.select { |t| t.name == source.name }
+      to.of_type(source).select { |t| t.name == source.name }
     end
 
     def find_match_by_case_insensitive_name(source)
       name = source.name.downcase
-      to.select { |t| t.name.downcase == name }
+      to.of_type(source).select { |t| t.name.downcase == name }
     end
 
     def find_match_by_word(source, attr=:name)
@@ -158,7 +158,7 @@ module Miwomi
       name.scan(/\w+/i).reverse.each do |substr|
         next if substr == 'tile'
         exp = /\b#{substr}\b/i
-        found = to.select do |t|
+        found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
             val =~ exp
           end
@@ -175,7 +175,7 @@ module Miwomi
       name = source.name
       name.scan(/\w+/i).reverse.each do |substr|
         next if substr == 'tile'
-        found = to.select do |t|
+        found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
             val.downcase.include?(substr.downcase)
           end

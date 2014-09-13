@@ -14,6 +14,12 @@ module Miwomi
       @all = nil
     end
 
+    def self.load_all
+      Dir[ "#{Pathname.new(__FILE__).sub_ext('')}s/*.rb" ].each do |f|
+        require f
+      end
+    end
+
     def self.insert(options={}, &block)
       name = options.fetch(:name) do
         Pathname.new(caller[2].split(':').first).basename.sub_ext('')

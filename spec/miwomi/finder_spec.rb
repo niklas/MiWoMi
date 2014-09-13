@@ -96,4 +96,11 @@ describe Miwomi::Finder do
     end
   end
 
+  context '.load_all' do
+    it 'loads some finders' do
+      described_class.load_all
+      described_class.all.should have_at_least(1).items
+    end
+  end
+
 end

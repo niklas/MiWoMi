@@ -13,6 +13,16 @@ describe Miwomi::Finder do
       f.should < described_class
     end
 
+    it 'allows to define instance methods in provided block' do
+      k = described_class.insert do
+        def foo
+          23
+        end
+      end
+
+      k.new.foo.should == 23
+    end
+
   end
 
 end

@@ -254,41 +254,35 @@ module Miwomi
     end
 
     def select_including_any_word(words, source, attr=:name)
-      words.map do |substr|
-        next if is_kill_word?(substr)
-        exp = /\b#{substr}\b/i
-        found = to.of_type(source).select do |t|
-          if val = t.public_send(attr)
-            val =~ exp
-          end
-        end
-        if found.length == 1
-          return found
-        end
-        found.length < 8 ? found : []
-      end.flatten.compact.uniq
+      select_match_any words, source, attr, ->(w) { /\b#{w}\b/i } { |exp, v| !!exp.match(v) }
     end
 
     def find_match_by_substring(name, source, attr=:name)
       select_match_any_substring name.scan(/\w+/i).reverse, source, attr
     end
 
-    def find_match_by_camel_bumps(name, source, attr=:name)
-      select_match_any_substring name.underscore.scan(/\w+/i).reverse, source, attr
+    def find_match_by_camel_bumps(exp, source, attr=:name)
+      exp = exp.sub 'net.minecraft.block.', ''
+      select_match_any_substring exp.underscore.scan(/[[:alnum:]]+/i).reverse, source, attr
     end
 
     def select_match_any_substring(substrings, source, attr)
-      substrings.map do |substr|
-        next if is_kill_word?(substr)
+      select_match_any substrings, source, attr, ->(s) { s.downcase } { |s,v| v.downcase.include?(s) }
+    end
+
+    def select_match_any(items, source, attr=:name, prepare=->(w) {w})
+      items.map do |item|
+        next if is_kill_word?(item)
+        prepared = prepare[item]
         found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
-            val.downcase.include?(substr.downcase)
+            yield(prepared, val)
           end
         end
-        unless found.empty?
+        if found.length == 1
           return found
         end
-        found.length < 8 ? found : []
+        found.length < 23 ? found : []
       end.flatten.compact.uniq
     end
 
@@ -307,6 +301,7 @@ module Miwomi
 
     KillWords = %w(
       tile
+      block
       minecraft
     ).map(&:downcase)
     def is_kill_word?(word)

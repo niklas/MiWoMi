@@ -147,8 +147,8 @@ module Miwomi
         finders << [:exact_klass,        lambda {|s| find_match_by_exact_klass s } ]
         finders << [:alternative_names,  lambda {|s| find_match_by_alternative_name s } ]
         finders << [:case_ins_name,      lambda {|s| find_match_by_case_insensitive_name s } ]
-        finders << [:word_of_klass,      lambda {|s| find_match_by_word(s, :klass) } ]
-        finders << [:word_of_name,       lambda {|s| find_match_by_word(s, :name) } ]
+        finders << [:word_of_klass,      lambda {|s| find_match_by_word(s.name, s, :klass) } ]
+        finders << [:word_of_name,       lambda {|s| find_match_by_word(s.name, s, :name) } ]
         finders << [:substring_of_klass, lambda {|s| find_match_by_substring(s.name, s, :klass) } ]
         finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s.name, s, :name) } ]
         finders << [:ore_substring_ignored,  lambda {|s|
@@ -249,11 +249,13 @@ module Miwomi
       to.of_type(source).select { |t| t.name.downcase == name }
     end
 
-    def find_match_by_word(source, attr=:name)
-      name = source.name
-      name.scan(/\w+/i).reverse.map do |substr|
-        next if substr == 'tile'
-        next if substr == 'minecraft'
+    def find_match_by_word(name, source, attr=:name)
+      select_including_any_word name.scan(/\w+/i).reverse, source, attr
+    end
+
+    def select_including_any_word(words, source, attr=:name)
+      words.map do |substr|
+        next if is_kill_word?(substr)
         exp = /\b#{substr}\b/i
         found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
@@ -277,12 +279,10 @@ module Miwomi
 
     def select_match_any_substring(substrings, source, attr)
       substrings.map do |substr|
-        next if substr == 'tile'
-        next if substr == 'minecraft'
-        expr = /\b#{substr}\b/i
+        next if is_kill_word?(substr)
         found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
-            !!expr.match(val.downcase)
+            val.downcase.include?(substr.downcase)
           end
         end
         unless found.empty?
@@ -304,6 +304,15 @@ module Miwomi
     def hints
       @hints ||= []
     end
+
+    KillWords = %w(
+      tile
+      minecraft
+    ).map(&:downcase)
+    def is_kill_word?(word)
+      KillWords.include? word.downcase
+    end
+
 
     def argument_hint(source)
       if identical = to.find_by_id(source)

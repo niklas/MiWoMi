@@ -138,6 +138,7 @@ module Miwomi
       @finders = [].tap do |finders|
         #finders << lambda {|s| find_match_by_same_id s }
         finders << [:exact_name,         lambda {|s| find_match_by_exact_name s } ]
+        finders << [:exact_klass,        lambda {|s| find_match_by_exact_klass s } ]
         finders << [:alternative_names,  lambda {|s| find_match_by_alternative_name s } ]
         finders << [:case_ins_name,      lambda {|s| find_match_by_case_insensitive_name s } ]
         finders << [:word_of_klass,      lambda {|s| find_match_by_word(s, :klass) } ]
@@ -199,6 +200,10 @@ module Miwomi
 
     def find_match_by_exact_name(source)
       to.of_type(source).select { |t| t.name == source.name }
+    end
+
+    def find_match_by_exact_klass(source)
+      to.of_type(source).select { |t| t.klass == source.klass }
     end
 
     def find_match_by_alternative_name(source)

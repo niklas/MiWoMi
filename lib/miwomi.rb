@@ -12,6 +12,7 @@ module Miwomi
   autoload :Block      , 'miwomi/block'
   autoload :Item       , 'miwomi/item'
   autoload :Patch      , 'miwomi/patch'
+  autoload :Finder     , 'miwomi/finder'
 
   autoload :Collection , 'miwomi/collection'
 

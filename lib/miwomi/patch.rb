@@ -191,9 +191,21 @@ module Miwomi
         else
           result
         end
-      end.flatten.compact.sort.uniq
+      end.flatten.compact
 
 
+      # count how often each block was found
+      found_count = found.
+        inject( Hash.new { |h,k| h[k] = 0 }) { |i,b| i[b]+=1; i}.
+        sort_by { |k,v| -v }
+
+      # if the first one was found more often then the second, use it
+      winner = found_count[0]
+      if winner[1] > 1 && winner[1] > found_count[1][1]
+        return winner[0]
+      end
+
+      found = found.sort.uniq
       if 1 < found.length && found.length < 13
         hint = argument_hint(source)
         raise AmbigousMatch, "could not find fuzzy match for #{source} " +

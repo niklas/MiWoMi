@@ -15,6 +15,13 @@ module Miwomi
           converters: :all
         ).each do |row|
           case row[:blockitem]
+          when nil # no "Block/Item" row
+            if row[:name] # 'minecraft:air'
+              result.add_thing 'Block', row[:id].to_i, row[:name], row[:class]
+              if row[:has_item] == 'true'
+                result.add_thing 'Item', row[:id].to_i, row[:name], row[:class]
+              end
+            end
           when 'null'
             # ignore that
           when /^Block|Item$/

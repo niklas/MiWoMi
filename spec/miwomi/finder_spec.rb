@@ -31,6 +31,11 @@ describe Miwomi::Finder do
       k.name.should == 'Miwomi::Finder::FinderSpec'
     end
 
+    it 'can override the name' do
+      k = described_class.insert(name: 'special_sauce') {}
+      k.name.should == 'Miwomi::Finder::SpecialSauce'
+    end
+
     context 'DSL' do
       it 'can define words' do
         f = described_class.insert do

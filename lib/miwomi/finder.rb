@@ -13,11 +13,13 @@ module Miwomi
       end
     end
 
-    def self.insert(&block)
-      file = Pathname.new caller.first.split(':').first
-      name = file.basename.sub_ext('').to_s.classify
+    def self.insert(options={}, &block)
+      name = options.fetch(:name) do
+        Pathname.new(caller[2].split(':').first).basename.sub_ext('')
+      end
+      klass_name = name.to_s.classify
       Class.new(self, &block).tap do |klass|
-        const_set name, klass
+        const_set klass_name, klass
         all << klass
       end
     end

@@ -31,6 +31,18 @@ describe Miwomi::Finder do
       k.name.should == 'Miwomi::Finder::FinderSpec'
     end
 
+    context 'DSL' do
+      it 'can define words' do
+        k = described_class.insert do
+          words { |source| source.split }
+        end
+
+        f = k.new
+        f.stub source: 'foo bar'
+        f.words.should == ['foo', 'bar']
+      end
+    end
+
   end
 
 end

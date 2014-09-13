@@ -4,6 +4,7 @@ gem 'rubycraft'
 gem 'nbtfile', github: 'ghoppe/nbtfile'
 gem 'ruby-progressbar'
 gem 'activesupport'
+gem 'monads'
 
 # development
 gem 'pry'

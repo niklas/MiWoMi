@@ -4,6 +4,7 @@ Bundler.require(:default)
 
 require 'active_support/inflector'
 require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/class/attribute'
 
 $: << File.expand_path('..', __FILE__)
 

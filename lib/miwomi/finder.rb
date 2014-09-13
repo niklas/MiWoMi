@@ -40,6 +40,15 @@ module Miwomi
       optional(self.class.word_builder).call(source).value
     end
 
+    class_attribute :candidate_attribute
+    def self.attribute(attr_name)
+      ensure_subklass!
+      self.candidate_attribute = attr_name
+    end
+    def attribute
+      optional(self.class.candidate_attribute)
+    end
+
 
 
 

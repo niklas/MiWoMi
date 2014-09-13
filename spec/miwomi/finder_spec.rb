@@ -33,13 +33,20 @@ describe Miwomi::Finder do
 
     context 'DSL' do
       it 'can define words' do
-        k = described_class.insert do
+        f = described_class.insert do
           words { |source| source.split }
-        end
+        end.new
 
-        f = k.new
         f.stub source: 'foo bar'
         f.words.should == ['foo', 'bar']
+      end
+
+      it 'can define attribute to call on every candidate' do
+        f = described_class.insert do
+          attribute :kloss
+        end.new
+
+        f.attribute.value.should == :kloss
       end
     end
 

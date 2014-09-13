@@ -63,12 +63,31 @@ describe Miwomi::Finder do
         f.words.should == ['foo', 'bar']
       end
 
-      it 'can define attribute to call on every candidate' do
+      it 'can define attribute to call on candidates and source' do
         f = described_class.insert do
           attribute :kloss
         end.new
 
-        f.attribute.value.should == :kloss
+        f.candidate_attribute.should == :kloss
+        f.source_attribute.should == :kloss
+      end
+
+      it 'can define attribute to call on candidates only' do
+        f = described_class.insert do
+          candidate_attribute :kloss
+        end.new
+
+        f.candidate_attribute.should == :kloss
+        f.source_attribute.should == :name
+      end
+
+      it 'can define attribute to call on source only' do
+        f = described_class.insert do
+          source_attribute :kloss
+        end.new
+
+        f.candidate_attribute.should == :name
+        f.source_attribute.should == :kloss
       end
 
       it 'can define how words are matched' do

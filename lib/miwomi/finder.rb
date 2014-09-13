@@ -55,22 +55,39 @@ module Miwomi
     # DSL
     ######################################################################################
 
-    class_attribute :word_builder
-    def self.words(&block)
-      ensure_subklass!
-      self.word_builder = block
+    class_attribute :configuration
+    def self.inherited(child)
+      super
+      child.configuration = {}
     end
-    def words
-      optional(self.class.word_builder).call(source).value
+    def conf(key, &default)
+      configuration.fetch(key, &default)
     end
 
-    class_attribute :candidate_attribute
+    def self.words(&block)
+      ensure_subklass!
+      configuration[:word_builder] = block
+    end
+    def words
+      self.class.configuration.fetch(:word_builder) { ->(x) {x} }[source]
+    end
+
     def self.attribute(attr_name)
       ensure_subklass!
-      self.candidate_attribute = attr_name
+      source_attribute attr_name
+      candidate_attribute attr_name
     end
-    def attribute
-      optional(self.class.candidate_attribute)
+    def self.source_attribute(attr_name)
+      configuration[:source_attribute] = attr_name
+    end
+    def self.candidate_attribute(attr_name)
+      configuration[:candidate_attribute] = attr_name
+    end
+    def source_attribute
+      conf(:source_attribute) { :name }
+    end
+    def candidate_attribute
+      conf(:candidate_attribute) { :name }
     end
 
     class_attribute :word_matcher

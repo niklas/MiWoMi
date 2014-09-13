@@ -142,8 +142,10 @@ module Miwomi
         finders << [:case_ins_name,      lambda {|s| find_match_by_case_insensitive_name s } ]
         finders << [:word_of_klass,      lambda {|s| find_match_by_word(s, :klass) } ]
         finders << [:word_of_name,       lambda {|s| find_match_by_word(s, :name) } ]
-        finders << [:substring_of_klass, lambda {|s| find_match_by_substring(s, :klass) } ]
-        finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s, :name) } ]
+        finders << [:substring_of_klass, lambda {|s| find_match_by_substring(s.name, s, :klass) } ]
+        finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s.name, s, :name) } ]
+        finders << [:ore_substring_ignored,  lambda {|s|
+          find_match_by_substring(s.name.gsub(/ore/i, ''), s, :name) } ]
       end
     end
 
@@ -232,8 +234,7 @@ module Miwomi
       end.flatten.compact.uniq
     end
 
-    def find_match_by_substring(source, attr=:name)
-      name = source.name
+    def find_match_by_substring(name, source, attr=:name)
       name.scan(/\w+/i).reverse.map do |substr|
         next if substr == 'tile'
         next if substr == 'minecraft'

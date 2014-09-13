@@ -41,6 +41,27 @@ if __FILE__ == $0
       end
     end
 
+    opts.on '-k', '--keep x,y,z',
+      "Drop blocks/items where x is an id, id range or substring",
+      "  -d 4,8,15,16,23,42",
+      "  -d 23-42",
+      "  -d 666,6-66",
+      "  they will vanish into thin air",
+      Array do |list|
+      list.each do |item|
+        case item
+        when /^\d+$/
+          options.keep_ids << item.to_i
+        when /^(\d+)-(\d+)$/
+          $1.to_i.upto($2.to_i) do |i|
+            options.keep_ids << i
+          end
+        else
+          raise "cannot understand how to keep #{item.inspect}"
+        end
+      end
+    end
+
    opts.on '-a', '--alternative foo/bar,bam/baz',
      "try an alternative if first name does not yield match (renamed plugins)",
      "  if 'foo' is not found, it is replaced by 'bar'",

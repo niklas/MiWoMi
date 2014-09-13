@@ -7,6 +7,7 @@ module Miwomi
     class BadType < Exception; end
 
     def find_by_id(want)
+      want = want.id if want.respond_to?(:id)
       find { |x| x.id == want }
     end
 

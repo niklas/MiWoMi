@@ -65,6 +65,7 @@ module Miwomi
       OpenStruct.new.tap do |options|
         options.drop  = []
         options.drop_ids  = []
+        options.keep_ids  = []
         options.alternatives = []
         options.verbose = false
         options.progressbar = false
@@ -77,6 +78,7 @@ module Miwomi
       from.each do |source|
         progressbar.increment if options.progressbar
         next if TechnicalBlocks.include?(source.id)
+        next if options.keep_ids.include?(source.id)
         drop(source) && next if options.drop_ids.include?(source.id)
         drop(source) && next if options.drop.any? { |ign| source.name.include?(ign) }
         if to.find { |t| t.id == source.id && t.name == 'tile.ForgeFiller' }
@@ -93,7 +95,8 @@ module Miwomi
 
           found_translation(source, match)
         else
-          raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}"
+          hint = argument_hint(source)
+          raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}\n\n#{hint}"
         end
       end
     ensure
@@ -189,9 +192,10 @@ module Miwomi
 
 
       if 1 < found.length && found.length < 13
+        hint = argument_hint(source)
         raise AmbigousMatch, "could not find fuzzy match for #{source} " +
           "\ntried:\n#{tries}" +
-          "\nfound #{found.length} possibilities:\n#{found.join("\n")}"
+          "\nfound #{found.length} possibilities:\n#{found.join("\n")}\n\n#{hint}"
       end
       nil
     end
@@ -272,6 +276,23 @@ module Miwomi
     def output_filename_from_collections
       hash = Digest::SHA1.hexdigest from.inspect + to.inspect + options.inspect
       "#{hash}.midas"
+    end
+
+    def argument_hint(source)
+      if identical = to.find_by_id(source)
+        hint = <<-EOTXT
+If you think it matches, add -k #{source.id} to keep
+  #{source}
+as
+  #{identical}
+EOTXT
+      else
+        hint = <<-EOTXT
+If you don't care about the block
+  #{source}
+add -d #{source.id} to drop it.
+EOTXT
+      end
     end
   end
 end

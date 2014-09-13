@@ -218,6 +218,7 @@ module Miwomi
       name = source.name
       name.scan(/\w+/i).reverse.map do |substr|
         next if substr == 'tile'
+        next if substr == 'minecraft'
         exp = /\b#{substr}\b/i
         found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
@@ -235,6 +236,7 @@ module Miwomi
       name = source.name
       name.scan(/\w+/i).reverse.map do |substr|
         next if substr == 'tile'
+        next if substr == 'minecraft'
         found = to.of_type(source).select do |t|
           if val = t.public_send(attr)
             val.downcase.include?(substr.downcase)

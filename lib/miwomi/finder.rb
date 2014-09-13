@@ -49,6 +49,15 @@ module Miwomi
       optional(self.class.candidate_attribute)
     end
 
+    class_attribute :word_matcher
+    def self.match_word(&block)
+      ensure_subklass!
+      self.word_matcher = block
+    end
+    def word_matches_value?(word, value)
+      optional(self.class.word_matcher).call(word, value).value
+    end
+
 
 
 

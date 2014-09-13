@@ -48,6 +48,16 @@ describe Miwomi::Finder do
 
         f.attribute.value.should == :kloss
       end
+
+      it 'can define how words are matched' do
+        f = described_class.insert do
+          match_word do |w,v|
+            w == v.downcase
+          end
+        end.new
+
+        f.should be_word_matches_value('x', 'X')
+      end
     end
 
   end

@@ -23,6 +23,11 @@ describe Miwomi::Finder do
       k.new.foo.should == 23
     end
 
+    it 'has the name set by the file defined in' do
+      k = described_class.insert {}
+      k.name.should == 'Miwomi::Finder::FinderSpec'
+    end
+
   end
 
 end

@@ -147,6 +147,8 @@ module Miwomi
         finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s.name, s, :name) } ]
         finders << [:ore_substring_ignored,  lambda {|s|
           find_match_by_substring(s.name.gsub(/ore/i, ''), s, :name) } ]
+
+        finders << [:camel_bumps_of_klass, lambda {|s| find_match_by_camel_bumps(s.klass, s, :klass) } ]
       end
     end
 
@@ -240,7 +242,15 @@ module Miwomi
     end
 
     def find_match_by_substring(name, source, attr=:name)
-      name.scan(/\w+/i).reverse.map do |substr|
+      select_match_any_substring name.scan(/\w+/i).reverse, source, attr
+    end
+
+    def find_match_by_camel_bumps(name, source, attr=:name)
+      select_match_any_substring name.underscore.scan(/\w+/i).reverse, source, attr
+    end
+
+    def select_match_any_substring(substrings, source, attr)
+      substrings.map do |substr|
         next if substr == 'tile'
         next if substr == 'minecraft'
         found = to.of_type(source).select do |t|

@@ -2,6 +2,8 @@ require 'rubygems'
 require 'bundler/setup'
 Bundler.require(:default)
 
+require 'active_support/inflector'
+
 $: << File.expand_path('..', __FILE__)
 
 module Miwomi

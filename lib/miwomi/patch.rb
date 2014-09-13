@@ -96,7 +96,7 @@ module Miwomi
           found_translation(source, match)
         else
           hint = argument_hint(source)
-          raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}\n\n#{hint}"
+          raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}\n\n#{hints.join("\n")}"
         end
       end
     ensure
@@ -194,23 +194,30 @@ module Miwomi
       end.flatten.compact
 
 
-      # count how often each block was found
-      found_count = found.
-        inject( Hash.new { |h,k| h[k] = 0 }) { |i,b| i[b]+=1; i}.
-        sort_by { |k,v| -v }
+      if found.length > 1
+        # count how often each block was found
+        found_count = found.
+          inject( Hash.new { |h,k| h[k] = 0 }) { |i,b| i[b]+=1; i}.
+          sort_by { |k,v| -v }
 
-      # if the first one was found more often then the second, use it
-      winner = found_count[0]
-      if winner[1] > 1 && winner[1] > found_count[1][1]
-        return winner[0]
+        # if the first one was found more often then the second, use it
+        winner = found_count[0]
+        if winner[1] > 1 && winner[1] > found_count[1][1]
+          return winner[0]
+        else
+          hints << %Q~best candidates:~
+          found_count.first(5).each do |thing, count|
+            hints << %Q~  #{count}: #{thing}~
+          end
+        end
       end
 
       found = found.sort.uniq
       if 1 < found.length && found.length < 13
-        hint = argument_hint(source)
+        hints << argument_hint(source)
         raise AmbigousMatch, "could not find fuzzy match for #{source} " +
           "\ntried:\n#{tries}" +
-          "\nfound #{found.length} possibilities:\n#{found.join("\n")}\n\n#{hint}"
+          "\nfound #{found.length} possibilities:\n#{found.join("\n")}\n\n#{hints.join("\n")}"
       end
       nil
     end
@@ -291,6 +298,10 @@ module Miwomi
     def output_filename_from_collections
       hash = Digest::SHA1.hexdigest from.inspect + to.inspect + options.inspect
       "#{hash}.midas"
+    end
+
+    def hints
+      @hints ||= []
     end
 
     def argument_hint(source)

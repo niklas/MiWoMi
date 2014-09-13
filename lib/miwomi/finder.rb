@@ -2,7 +2,7 @@ require 'pathname'
 require 'monads/optional'
 
 module Miwomi
-  class Finder
+  class Finder < Struct.new(:source)
     def self.all
       @all ||= []
     end
@@ -38,6 +38,10 @@ module Miwomi
 
     def self.ensure_subklass!
       raise "please use Miwomi::Finder.insert" if self == Miwomi::Finder
+    end
+
+    def self.[](source)
+      new(source).results
     end
 
 

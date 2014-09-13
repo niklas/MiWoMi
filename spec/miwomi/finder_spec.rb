@@ -84,4 +84,16 @@ describe Miwomi::Finder do
 
   end
 
+  context '.[]' do
+    it 'returns results for the given source' do
+      k = described_class.insert do
+        def results # stub
+          [23]
+        end
+      end
+
+      k[double].should == [23]
+    end
+  end
+
 end

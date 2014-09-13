@@ -8,8 +8,8 @@ module Miwomi
     end
 
     def self.undefine_all
-      self.constants.each do |const|
-        remove_const const
+      all.each do |f|
+        remove_const f.name.demodulize
       end
       @all = nil
     end

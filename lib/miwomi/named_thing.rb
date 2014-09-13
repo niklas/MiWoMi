@@ -27,6 +27,15 @@ module Miwomi
     def <=>(other)
       id <=> other.id
     end
+
+    def name_without_namespace
+      @name_without_namespace ||=
+        if name =~ /^([\w_]+):(.+)$/i
+          $2
+        else
+          name
+        end
+    end
   end
 end
 

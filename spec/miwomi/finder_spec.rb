@@ -36,6 +36,24 @@ describe Miwomi::Finder do
       k.name.should == 'Miwomi::Finder::SpecialSauce'
     end
 
+    it 'can define position with :after' do
+      described_class.insert(name: 'plate') {}
+      described_class.insert(name: 'lower_patty') {}
+      described_class.insert(name: 'top_patty') {}
+      described_class.insert(name: 'beef', after: 'lower_patty') {}
+
+      described_class.all.map(&:internal_name).should == %w(plate lower_patty beef top_patty)
+    end
+
+    it 'can define position with :before' do
+      described_class.insert(name: 'plate') {}
+      described_class.insert(name: 'lower_patty') {}
+      described_class.insert(name: 'top_patty') {}
+      described_class.insert(name: 'beef', before: 'top_patty') {}
+
+      described_class.all.map(&:internal_name).should == %w(plate lower_patty beef top_patty)
+    end
+
     context 'DSL' do
       it 'can define words' do
         f = described_class.insert do

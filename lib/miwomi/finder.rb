@@ -11,6 +11,7 @@ module Miwomi
       self.constants.each do |const|
         remove_const const
       end
+      @all = nil
     end
 
     def self.insert(options={}, &block)
@@ -20,8 +21,19 @@ module Miwomi
       klass_name = name.to_s.classify
       Class.new(self, &block).tap do |klass|
         const_set klass_name, klass
-        all << klass
+
+        if (iname = options[:after]) && (pos = all.index { |k| k.internal_name == iname })
+          all.insert pos+1, klass
+        elsif (iname = options[:before]) && (pos = all.index { |k| k.internal_name == iname })
+          all.insert pos, klass
+        else
+          all << klass
+        end
       end
+    end
+
+    def self.internal_name
+      name.demodulize.underscore
     end
 
     def self.ensure_subklass!

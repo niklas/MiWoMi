@@ -3,6 +3,7 @@ require 'bundler/setup'
 Bundler.require(:default)
 
 require 'active_support/inflector'
+require 'active_support/core_ext/object/blank'
 
 $: << File.expand_path('..', __FILE__)
 

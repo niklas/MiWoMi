@@ -15,7 +15,7 @@ module Miwomi
     end
 
     def to_s
-      k = klass.to_s
+      k = descriptive_klass.to_s
       k = " [#{k}]" unless k.empty?
       %Q~<#{short_class_name} #{name.inspect} (#{id})#{k}>~
     end
@@ -26,6 +26,18 @@ module Miwomi
 
     def <=>(other)
       id <=> other.id
+    end
+
+    def descriptive_name
+      @descriptive_name ||= name.dup.tap do |m|
+        m.sub! /^([\w_]+):/i, ''
+      end
+    end
+
+    def descriptive_klass
+      @descriptive_klass ||= (klass.presence || '').tap do |m|
+        m.sub! 'net.minecraft.block.', ''
+      end
     end
 
     def name_without_namespace

@@ -77,6 +77,22 @@ module Miwomi
       end
     end
 
+    def write_results_by_finder(io)
+      indent = lambda { |f| "    #{f}" }
+      io << 'tried:'
+      candidates_by_finder.map do |finder, candidates|
+        name = finder.internal_name
+        found = candidates.map(&:thing)
+        [ "  #{name}:" ] +
+        if found.length > 7
+          found[0..6].map(&indent) +
+            [ indent["... and #{found.length - 7} more"] ]
+        else
+          found.map(&indent)
+        end
+      end.each { |l| io << l }
+    end
+
   private
 
     def found!(finder, result, weight)

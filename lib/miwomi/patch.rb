@@ -159,42 +159,33 @@ module Miwomi
       end
     end
 
-    def tries
-      if @tried.empty?
-        'nothing'
-      else
-        indent = lambda { |f| "    #{f}" }
-        @tried.map do |name, found|
-          [ "  #{name}:" ] +
-          if found.length > 7
-            found[0..6].map(&indent) +
-              [ indent["... and #{found.length - 7} more"] ]
-          else
-            found.map(&indent)
-          end
-        end.flatten.join("\n")
-      end
-    end
-
     def find_match(source)
       matcher = Matcher.new(source)
       matcher.run
       candidates = matcher.candidates
+
       if candiates.length > 1
-        matcher.write_candidates_hint(hints)
+        if best = matcher.best_candidate
+          return best
+        else
+          matcher.write_results_by_finder(hints)
+          matcher.write_candidates_hint(hints)
+        end
       end
 
       if candidates.length == 1
         return candidates.first.thing
       end
 
-      if 1 < found.length && found.length < 13
-        hints << argument_hint(source)
-        raise AmbigousMatch, "could not find fuzzy match for #{source} " +
-          "\ntried:\n#{tries}" +
-          "\nfound #{found.length} possibilities:\n#{found.join("\n")}\n\n#{hints.join("\n")}"
-      end
-      nil
+      hints << argument_hint(source)
+      raise AmbigousMatch, (
+        [
+          "could not find fuzzy match for",
+         "   #{source}",
+          "found #{candidates.length} candidates"
+        ] +
+        hints
+      ).join("\n")
     end
 
     def find_match_by_same_id(source)

@@ -38,11 +38,6 @@ module Miwomi
             found! finder, result, 5
           end
 
-          # matching in some way AND the id is the same? looks like we found it
-          if result.id == source.id
-            found! finder, result, 12
-          end
-
         end
       end
     end

@@ -1,5 +1,7 @@
 module Miwomi
   class Matcher
+    include Miwomi::Logger
+
     attr_reader :source
     def initialize(source, options={})
       @source = source
@@ -25,7 +27,9 @@ module Miwomi
     def run
       @finders.each do |finder|
         finder_name = finder.internal_name
-        results = finder.results
+        results = benchmark "running Finder: #{finder_name}" do
+          finder.results
+        end
         unless results
           raise "finder did return nil, should return at least empty array: #{finder}"
         end

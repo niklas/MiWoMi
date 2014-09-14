@@ -23,4 +23,6 @@ module Miwomi
   autoload :DumpParser , 'miwomi/dump_parser'
   # Work in Progress
   autoload :FileLandscape, 'miwomi/file_landscape'
+
+  autoload :Logger, 'miwomi/logger'
 end

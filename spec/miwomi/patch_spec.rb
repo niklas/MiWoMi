@@ -265,7 +265,6 @@ describe Miwomi::Patch do
         let(:subject2) { described_class.new from, to, options }
         before do
           subject2.options.progress_path = path
-          subject2.resume
         end
 
         let(:trs) { subject2.translations }
@@ -279,6 +278,27 @@ describe Miwomi::Patch do
           trs[1].to.should == to2
           keeps.should include(kept)
         end
+
+        context '#apply' do
+          it 'resumes where saved' do
+            subject2.should_not_receive(:find_match).with(from1)
+            subject2.should_not_receive(:find_match).with(from2)
+            subject2.should_receive(:find_match).with(todo) { nil }
+            expect { subject2.apply }.to raise_error(Miwomi::Patch::NoMatchFound)
+          end
+        end
+      end
+    end
+
+    context '#already_processed?' do
+      it 'is true when translated' do
+        subject.should have_already_processed(from1)
+      end
+      it 'is true when kept' do
+        subject.should have_already_processed(kept)
+      end
+      it 'else is false' do
+        subject.should_not have_already_processed(todo)
       end
     end
   end

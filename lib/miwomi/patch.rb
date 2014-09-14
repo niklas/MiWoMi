@@ -76,6 +76,7 @@ module Miwomi
       prepare
       from.each do |source|
         progressbar.increment if options.progressbar
+        next if has_already_processed?(source)
         if requested = options.move_ids[source.id]
           found_translation_by_id(source, requested)
           next
@@ -150,6 +151,11 @@ module Miwomi
       encoder.tag = nil
       encoder['translations'] = @translations
       encoder['keeps'] = @keeps.map(&:id)
+    end
+
+    def has_already_processed?(thing)
+      keeps.include?(thing) ||
+        translations.any? { |t| t.from == thing }
     end
 
   private

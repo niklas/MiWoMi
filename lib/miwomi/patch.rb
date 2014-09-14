@@ -222,7 +222,7 @@ module Miwomi
     end
 
     def output_filename_from_collections
-      hash = Digest::SHA1.hexdigest from.inspect + to.inspect + options.inspect
+      hash = Digest::SHA1.hexdigest from.inspect + to.inspect
       "#{hash}.midas"
     end
 

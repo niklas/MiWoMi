@@ -110,6 +110,14 @@ describe Miwomi::Finder do
 
         f.should be_value_matches_value('x', 'X')
       end
+
+      it 'can define weight' do
+        f = described_class.insert do
+          weight 5
+        end.new
+
+        f.weight.should == 5
+      end
     end
 
   end

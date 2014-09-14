@@ -94,10 +94,11 @@ module Miwomi
   private
 
     def found!(finder, result, weight)
+      w = weight * finder.weight
       if candidate = candidate_by_result[result]
-        candidate.weight += weight
+        candidate.weight += w
       else
-        candidate = candidate_by_result[result] = Candidate.new(result, weight)
+        candidate = candidate_by_result[result] = Candidate.new(result, w)
       end
       candidates_by_finder[finder] << candidate
     end

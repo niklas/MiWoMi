@@ -150,6 +150,15 @@ module Miwomi
       instance_exec mine, theirs, &self.class.value_matcher
     end
 
+    class_attribute :weight_per_match
+    def self.weight(i)
+      ensure_subklass!
+      self.weight_per_match = i
+    end
+    def weight
+      self.class.weight_per_match || 1
+    end
+
 
 
 

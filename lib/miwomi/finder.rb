@@ -66,7 +66,7 @@ module Miwomi
     end
 
     def results
-      @list.of_type(source).select method(:candidate?)
+      @list.of_type(source).select &method(:candidate?)
     end
 
     def candidate?(cand)

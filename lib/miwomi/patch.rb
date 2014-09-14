@@ -4,6 +4,7 @@ module Miwomi
   class Patch
     include Logger
     attr_reader :translations
+    attr_reader :keeps
     attr_reader :from, :to
     attr_reader :options
 
@@ -11,6 +12,7 @@ module Miwomi
       @from    = from
       @to      = to
       @options = options
+      prepare
     end
 
     class Error < RuntimeError
@@ -140,14 +142,14 @@ module Miwomi
         if p = parsed.fetch('translations')
           @translations = Translation.from_array_of_hashes p, from, to
         end
-        #@keeps =
+        @keeps = parsed.fetch('keeps').map { |kid| from.find_by_id(kid) }
       end
     end
 
     def encode_with encoder
       encoder.tag = nil
       encoder['translations'] = @translations
-      encoder['keeps'] = @keeps
+      encoder['keeps'] = @keeps.map(&:id)
     end
 
   private

@@ -228,7 +228,7 @@ describe Miwomi::Patch do
     after  { FileUtils.rm_f path }
     let(:content) { File.read path }
 
-    let(:from) { collection(from1, from2, todo) }
+    let(:from) { collection(from1, from2, kept, todo) }
     let(:to)   { collection(to2, to1) }
 
     let(:todo)  { thing id: 666, name: 'Beast' }
@@ -237,8 +237,11 @@ describe Miwomi::Patch do
     let(:to1)   { thing id: 42, name: 'Wine' }
     let(:to2)   { thing id: 23, name: 'Fear' }
 
+    let(:kept)  { thing id: 9001, name: 'Spirit' }
+
     before do
       subject.options.progress_path = path
+      subject.options.keep_ids = [kept.id]
       subject.stub(:find_match).with(from1) { to1 }
       subject.stub(:find_match).with(from2) { to2 }
       subject.stub(:find_match).with(todo) { nil }
@@ -254,7 +257,7 @@ describe Miwomi::Patch do
             { 'from' => 23, 'to' => 42 },
             { 'from' => 17, 'to' => 23 },
           ],
-          'keeps' => [],
+          'keeps' => [9001],
         )
       end
 
@@ -266,6 +269,7 @@ describe Miwomi::Patch do
         end
 
         let(:trs) { subject2.translations }
+        let(:keeps) { subject2.keeps }
 
         it 'loads existing progress' do
           trs.should have(2).items
@@ -273,6 +277,7 @@ describe Miwomi::Patch do
           trs[0].to.should == to1
           trs[1].from.should == from2
           trs[1].to.should == to2
+          keeps.should include(kept)
         end
       end
     end

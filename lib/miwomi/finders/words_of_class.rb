@@ -1,5 +1,5 @@
 Miwomi::Finder.insert do
-  source_attribute :klass_word
+  source_attribute :klass_words
   candidate_attribute :descriptive_klass
   weight 3
 

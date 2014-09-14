@@ -66,12 +66,12 @@ module Miwomi
         options.verbose = false
         options.progressbar = false
         options.output_filename = nil
+        options.progress_path = nil
       end
     end
 
     def apply
-      Finder.load_all
-      @translations = []
+      prepare
       from.each do |source|
         progressbar.increment if options.progressbar
         if requested = options.move_ids[source.id]
@@ -97,10 +97,11 @@ module Miwomi
           found_translation(source, match)
         else
           hint = argument_hint(source)
-          raise NoMatchFound, "no match found for #{source}, tried:\n#{tries}\n\n#{hints.join("\n")}"
+          raise NoMatchFound, "no match found for #{source}\n\n#{hints.join("\n")}"
         end
       end
     ensure
+      save
       progressbar.stop if options.progressbar
     end
 
@@ -125,6 +126,20 @@ module Miwomi
       options[:output_filename] || output_filename_from_collections
     end
 
+    def save(path=options.progress_path)
+      if path
+        File.open path, 'w' do |f|
+          f.write to_yaml
+        end
+      end
+    end
+
+    def encode_with encoder
+      encoder.tag = nil
+      encoder['translations'] = @translations
+      encoder['keeps'] = @keeps
+    end
+
   private
     def found_translation(source, match)
       translation = Translation.new(source, match)
@@ -143,8 +158,7 @@ module Miwomi
     end
 
     def keep(source)
-      # TODO store for resume
-      true
+      @keeps << source
     end
 
     def find_match(source)
@@ -176,6 +190,12 @@ module Miwomi
         ] +
         hints
       ).join("\n")
+    end
+
+    def prepare
+      Finder.load_all
+      @translations = []
+      @keeps = []
     end
 
     def progressbar

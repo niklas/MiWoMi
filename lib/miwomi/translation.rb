@@ -8,11 +8,10 @@ module Miwomi
       from && to
     end
 
-    def to_yaml
-      {
-        'from' => from.id,
-        'to'   => to.id
-      }.to_yaml
+    def encode_with encoder
+      encoder.tag = nil
+      encoder['from'] = from.id
+      encoder['to'] = to.id
     end
 
     class DeserializationFailed < ArgumentError; end

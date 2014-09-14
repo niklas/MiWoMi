@@ -1,4 +1,4 @@
-require 'miwomi'
+require 'spec_helper'
 
 RSpec::Matchers.define :translate_id do |from_id|
   match do |patch|
@@ -58,8 +58,8 @@ end
 describe Miwomi::Patch do
   let(:options) { described_class.default_opts }
   subject { described_class.new from, to, options }
-  let(:from) { double 'FromCollection' }
-  let(:to)   { double 'ToCollection' }
+  let(:from) { collection }
+  let(:to)   { collection }
 
   describe '.new' do
     it 'takes two collections and options' do
@@ -74,8 +74,6 @@ describe Miwomi::Patch do
   end
 
   describe '#apply' do
-    let(:from) { Miwomi::Collection.new }
-    let(:to)   { Miwomi::Collection.new }
     def block(id, name)
       Miwomi::Block.new(id, name)
     end
@@ -221,6 +219,44 @@ describe Miwomi::Patch do
       name = 'exactly_here.mamamidas'
       options.output_filename = name
       subject.output_filename.should == name
+    end
+  end
+
+  context 'save & resume' do
+    let(:path) { File.expand_path('../../../tmp/progess.yml', __FILE__) }
+    before { FileUtils.mkdir_p File.basename(path) }
+    after  { FileUtils.rm_f path }
+    let(:content) { File.read path }
+
+    let(:from) { collection(from1, from2, todo) }
+    let(:to)   { collection(to2, to1) }
+
+    let(:todo)  { thing id: 666, name: 'Beast' }
+    let(:from1) { thing id: 23, name: 'Water' }
+    let(:from2) { thing id: 17, name: 'Knowlege' }
+    let(:to1)   { thing id: 42, name: 'Wine' }
+    let(:to2)   { thing id: 23, name: 'Fear' }
+
+    before do
+      subject.options.progress_path = path
+      subject.stub(:find_match).with(from1) { to1 }
+      subject.stub(:find_match).with(from2) { to2 }
+      subject.stub(:find_match).with(todo) { nil }
+      expect { subject.apply }.to raise_error(Miwomi::Patch::NoMatchFound)
+    end
+
+    context '#apply' do
+      it 'saves as yaml' do
+        content.should_not be_blank
+        parsed = YAML.load(content)
+        parsed.should be_hash_matching(
+          'translations' => [
+            { 'from' => 23, 'to' => 42 },
+            { 'from' => 17, 'to' => 23 },
+          ],
+          'keeps' => [],
+        )
+      end
     end
   end
 end

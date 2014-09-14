@@ -1,4 +1,5 @@
 require 'miwomi'
+require 'rspec/matchers'
 require 'diff_matcher'
 
 module RSpec

@@ -44,7 +44,7 @@ module Miwomi
 
           # only one? that's special
           if results.count == 1
-            found! finder, result, 5
+            found! finder, result, 2
           end
 
         end

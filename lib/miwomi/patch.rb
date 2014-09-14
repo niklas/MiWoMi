@@ -139,29 +139,8 @@ module Miwomi
       found_translation source, source.class.new( 0, "dropped")
     end
 
-    def finders
-      @finders = [].tap do |finders|
-        #finders << lambda {|s| find_match_by_same_id s }
-        finders << [:exact_name,         ->(s) {
-          find_match_by_exact s.name, s, :name } ]
-        finders << [:name_without_namespace, ->(s) {
-          find_match_by_exact s.name, s, :name_without_namespace } ]
-        finders << [:exact_klass,        lambda {|s| find_match_by_exact_klass s } ]
-        finders << [:alternative_names,  lambda {|s| find_match_by_alternative_name s } ]
-        finders << [:case_ins_name,      lambda {|s| find_match_by_case_insensitive_name s } ]
-        finders << [:word_of_klass,      lambda {|s| find_match_by_word(s.name, s, :klass) } ]
-        finders << [:word_of_name,       lambda {|s| find_match_by_word(s.name, s, :name) } ]
-        finders << [:substring_of_klass, lambda {|s| find_match_by_substring(s.name, s, :klass) } ]
-        finders << [:substring_of_name,  lambda {|s| find_match_by_substring(s.name, s, :name) } ]
-        finders << [:ore_substring_ignored,  lambda {|s|
-          find_match_by_substring(s.name.gsub(/ore/i, ''), s, :name) } ]
-
-        finders << [:camel_bumps_of_klass, lambda {|s| find_match_by_camel_bumps(s.klass, s, :klass) } ]
-      end
-    end
-
     def find_match(source)
-      matcher = Matcher.new(source, list: to)
+      matcher = Matcher.new(source, list: to, options: options)
       benchmark "match #{source}" do
         matcher.run
       end
@@ -189,70 +168,6 @@ module Miwomi
         ] +
         hints
       ).join("\n")
-    end
-
-    def find_match_by_same_id(source)
-      []
-    end
-
-    def find_match_by_exact(exp, source, attr=:name)
-      to.of_type(source).select { |t| t.public_send(attr) == exp }
-    end
-
-    def find_match_by_exact_klass(source)
-      to.of_type(source).select { |t| t.klass == source.klass }
-    end
-
-    def find_match_by_alternative_name(source)
-      options.alternatives.map do |original, alt|
-        if source.name.include?(original)
-          to.of_type(source).select { |t| t.name == source.name.gsub(Regexp.new(original), alt) }
-        else
-          nil
-        end
-      end.flatten.compact.uniq
-    end
-
-    def find_match_by_case_insensitive_name(source)
-      name = source.name.downcase
-      to.of_type(source).select { |t| t.name.downcase == name }
-    end
-
-    def find_match_by_word(name, source, attr=:name)
-      select_including_any_word name.scan(/\w+/i).reverse, source, attr
-    end
-
-    def select_including_any_word(words, source, attr=:name)
-      select_match_any words, source, attr, ->(w) { /\b#{w}\b/i } { |exp, v| !!exp.match(v) }
-    end
-
-    def find_match_by_substring(name, source, attr=:name)
-      select_match_any_substring name.scan(/\w+/i).reverse, source, attr
-    end
-
-    def find_match_by_camel_bumps(exp, source, attr=:name)
-      exp = exp.sub 'net.minecraft.block.', ''
-      select_match_any_substring exp.underscore.scan(/[[:alnum:]]+/i).reverse, source, attr
-    end
-
-    def select_match_any_substring(substrings, source, attr)
-      select_match_any substrings, source, attr, ->(s) { s.downcase } { |s,v| v.downcase.include?(s) }
-    end
-
-    def select_match_any(items, source, attr=:name, prepare=->(w) {w})
-      items.map do |item|
-        next if is_kill_word?(item)
-        prepared = prepare[item]
-        found = to.of_type(source).select do |t|
-          if val = t.public_send(attr)
-            yield(prepared, val)
-          end
-        end
-        if found.length == 1
-          return found
-        end
-        found.length < 23 ? found : []
-      end.flatten.compact.uniq
     end
 
     def progressbar

@@ -65,6 +65,7 @@ module Miwomi
     def initialize(source=[], options={})
       @source = source
       @list = options.fetch(:list) { [] }
+      @options = options[:options]
     end
 
     def results
@@ -137,7 +138,7 @@ module Miwomi
       self.word_matcher = block
     end
     def word_matches_value?(word, value)
-      self.class.word_matcher.call(word, value)
+      instance_exec word, value, &self.class.word_matcher
     end
 
     class_attribute :value_matcher
@@ -146,7 +147,7 @@ module Miwomi
       self.value_matcher = block
     end
     def value_matches_value?(mine, theirs)
-      optional(self.class.value_matcher).call(mine, theirs).value
+      instance_exec mine, theirs, &self.class.value_matcher
     end
 
 

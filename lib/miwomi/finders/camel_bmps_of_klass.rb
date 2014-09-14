@@ -7,7 +7,7 @@ Miwomi::Finder.insert do
       reverse
   end
 
-  attribute :klass
+  attribute :descriptive_klass
 
   match_word do |word, value|
     value.downcase.include?(word)

@@ -5,7 +5,7 @@ module Miwomi
     attr_reader :source
     def initialize(source, options={})
       @source = source
-      @finders = options.fetch(:finders) { Finder.all_for(source, list: options[:list]) }
+      @finders = options.fetch(:finders) { Finder.all_for(source, list: options[:list], options: options[:options]) }
       @runNing = false
     end
 

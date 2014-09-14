@@ -1,7 +1,8 @@
 Miwomi::Finder.insert do
-  attribute :descriptive_klass
+  attribute :descriptive_name
 
   match_value do |source, candidate|
-    source == candidate
+    source.downcase == candidate.downcase
   end
 end
+

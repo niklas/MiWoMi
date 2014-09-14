@@ -3,6 +3,6 @@ Miwomi::Finder.insert do
   weight 9
 
   match_value do |source, candidate|
-    source == candidate
+    source.downcase == candidate.downcase
   end
 end

@@ -8,6 +8,7 @@ module Miwomi
 
     def find_by_id(want)
       want = want.id if want.respond_to?(:id)
+      want = want.to_i if want.respond_to?(:to_i)
       find { |x| x.id == want }
     end
 

@@ -40,6 +40,10 @@ module StubbedFactorySpecHelpers
     double('NamedThing', {id: id || attrs.object_id, to_s: id}.merge(attrs))
   end
 
+  def collection(*list)
+    Miwomi::Collection.new(list)
+  end
+
   def finder(attrs={})
     double('Finder', {weight: 1, internal_name_with_weight: 'hihi:23'}.merge(attrs))
   end

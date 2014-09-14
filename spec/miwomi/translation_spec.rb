@@ -15,4 +15,46 @@ describe Miwomi::Translation do
       }
     end
   end
+
+  context '.from_yaml' do
+    let(:froms) { collection(from1, from2) }
+    let(:tos)   { collection(to2, to1) }
+
+    let(:from1) { thing id: 23, name: 'Water' }
+    let(:from2) { thing id: 17, name: 'Knowlege' }
+    let(:to1)   { thing id: 42, name: 'Wine' }
+    let(:to2)   { thing id: 23, name: 'Fear' }
+
+    let(:source)  { [
+      { 'from' => 23, 'to' => 42 }, # water to wine
+      { 'from' => 17, 'to' => 23 }, # knowledge brings fear
+    ]}
+
+    let(:yaml) { source.to_yaml }
+
+    subject { described_class.from_yaml yaml, froms, tos }
+
+    let(:first)  { subject.first }
+    let(:second) { subject[1] }
+
+    it 'finds "from" blocks from supplied collection' do
+      first.from.should == from1
+      second.from.should == from2
+    end
+
+    it 'finds "to" blocks from supplied collection' do
+      first.to.should == to1
+      second.to.should == to2
+    end
+
+    it 'fails when "from" block is not loaded' do
+      source[0]['from'] = 66
+      expect { subject }.to raise_error
+    end
+
+    it 'fails when "to" block is not loaded' do
+      source[0]['to'] = 66
+      expect { subject }.to raise_error
+    end
+  end
 end

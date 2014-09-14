@@ -17,7 +17,7 @@ module Miwomi
     def to_s
       k = descriptive_klass.to_s
       k = " [#{k}]" unless k.empty?
-      %Q~<#{short_class_name} #{descriptive_name.inspect} (#{id})#{k}>~
+      %Q~<#{short_class_name} #{descriptive_name.inspect.colorize(:magenta)} (#{id.to_s.colorize(:cyan)})#{k}>~
     end
 
     def short_class_name

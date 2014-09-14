@@ -5,6 +5,7 @@ gem 'nbtfile', github: 'ghoppe/nbtfile'
 gem 'ruby-progressbar'
 gem 'activesupport'
 gem 'monads'
+gem 'colorize'
 
 # development
 gem 'pry'

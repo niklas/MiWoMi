@@ -67,19 +67,25 @@ module Miwomi
     def best_candidate
       weights = weighted_candidates(false)
       # if the first one weights much more than the second, use it
-      top = weights[0]
-      w = top[1]
+      t = weights[0]
+      top_weight = t[1]
+      top = t[0].thing
 
-      # possible winner
-      winner = top[0].thing
+      n = weights[1]
+      nxt_weight = n[1]
+      nxt = n[0].thing
 
-      if w > 10 # must have at least so many points
-        n = weights[1][1]
-        if (0..6).cover?(n) || # next one is so small, we must be the winner
-            w > n + 10      || # winner is 10 points ahead
-            w > n * 1.5     || # winner has 50% more points
-            false              ## better diffs
-          return winner
+
+      if top_weight > 10 # must have at least so many points
+        if (0..6).cover?(nxt_weight)      || # next one is so small, we must be the winner
+            top_weight > nxt_weight + 10  || # winner is 10 points ahead
+            top_weight > nxt_weight * 1.5 || # winner has 50% more points
+            top == source                 || # Identity is kept per points
+            false                            ## better diffs
+          return top
+        elsif nxt == source               || # close miss
+            false
+          return nxt
         end
       end
     end

@@ -28,6 +28,10 @@ module Miwomi
       id <=> other.id
     end
 
+    def ==(other)
+      id == other.id
+    end
+
     def descriptive_name
       @descriptive_name ||= name.dup.tap do |m|
         m.sub! /^([\w_]+):/i, ''

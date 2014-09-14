@@ -2,6 +2,7 @@ require 'digest/sha1'
 
 module Miwomi
   class Patch
+    include Logger
     attr_reader :translations
     attr_reader :from, :to
     attr_reader :options
@@ -161,7 +162,9 @@ module Miwomi
 
     def find_match(source)
       matcher = Matcher.new(source, list: to)
-      matcher.run
+      benchmark "match #{source}" do
+        matcher.run
+      end
       candidates = matcher.candidates
 
       if candidates.length == 1

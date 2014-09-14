@@ -121,10 +121,10 @@ module Miwomi
       configuration[:candidate_attribute] = attr_name
     end
     def source_attribute
-      conf(:source_attribute) { :name }
+      @source_attribute ||= conf(:source_attribute) { :name }
     end
     def candidate_attribute
-      conf(:candidate_attribute) { :name }
+      @candidate_attribute ||= conf(:candidate_attribute) { :name }
     end
 
     class_attribute :word_matcher
@@ -133,7 +133,7 @@ module Miwomi
       self.word_matcher = block
     end
     def word_matches_value?(word, value)
-      optional(self.class.word_matcher).call(word, value).value
+      self.class.word_matcher.call(word, value)
     end
 
     class_attribute :value_matcher

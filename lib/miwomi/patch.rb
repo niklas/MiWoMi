@@ -134,6 +134,16 @@ module Miwomi
       end
     end
 
+    def resume(path=options.progress_path)
+      if path && File.exist?(path)
+        parsed = YAML.load File.read(path)
+        if p = parsed.fetch('translations')
+          @translations = Translation.from_array_of_hashes p, from, to
+        end
+        #@keeps =
+      end
+    end
+
     def encode_with encoder
       encoder.tag = nil
       encoder['translations'] = @translations
@@ -196,6 +206,7 @@ module Miwomi
       Finder.load_all
       @translations = []
       @keeps = []
+      resume
     end
 
     def progressbar

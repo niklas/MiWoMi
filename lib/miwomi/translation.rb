@@ -17,8 +17,12 @@ module Miwomi
     class DeserializationFailed < ArgumentError; end
 
     def self.from_yaml(yaml, froms, tos)
+      from_array_of_hashes YAML.load(yaml), froms, tos
+    end
+
+    def self.from_array_of_hashes(aoh, froms, tos)
       [].tap do |list|
-        YAML.load(yaml).each do |i|
+        aoh.each do |i|
           from = froms.find_by_id(i['from'])
           to = tos.find_by_id(i['to'])
 

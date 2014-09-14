@@ -257,6 +257,24 @@ describe Miwomi::Patch do
           'keeps' => [],
         )
       end
+
+      context 'resuming' do
+        let(:subject2) { described_class.new from, to, options }
+        before do
+          subject2.options.progress_path = path
+          subject2.resume
+        end
+
+        let(:trs) { subject2.translations }
+
+        it 'loads existing progress' do
+          trs.should have(2).items
+          trs[0].from.should == from1
+          trs[0].to.should == to1
+          trs[1].from.should == from2
+          trs[1].to.should == to2
+        end
+      end
     end
   end
 end

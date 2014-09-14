@@ -61,16 +61,15 @@ module Miwomi
     end
 
     def best_candidate
-      # if the first one was found more often then the second, use it
-      winner = found_count[0]
-      if winner[1] > 1 && winner[1] > found_count[1][1]
+      weights = weighted_candidates(false)
+      # if the first one weights much more than the second, use it
+      winner = weights[0]
+      if winner[1] > 1 && winner[1] > weights[1][1] * 3
         return winner[0]
       end
     end
 
     def write_candidates_hint(io)
-      found_count = weighted_candidates
-
       io << %Q~best candidates:~
       weighted_candidates(false).first(5).each do |thing, weight|
         io << '% 5i: %s' % [weight,thing]

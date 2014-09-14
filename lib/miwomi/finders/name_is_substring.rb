@@ -3,7 +3,7 @@ Miwomi::Finder.insert do
   weight 4
 
   match_value do |mine, theirs|
-    mine.scan(/\b\w+\b/i).any? do |t|
+    theirs.scan(/\b\w+\b/i).any? do |t|
       mine.downcase.include?(t.downcase)
     end
   end

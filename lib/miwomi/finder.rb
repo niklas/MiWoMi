@@ -21,8 +21,9 @@ module Miwomi
     end
 
     def self.load_all
+      undefine_all
       Dir[ "#{Pathname.new(__FILE__).sub_ext('')}s/*.rb" ].each do |f|
-        require f
+        load f
       end
     end
 

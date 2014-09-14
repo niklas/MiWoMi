@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe Miwomi::Finder do
-  before do
-    described_class.undefine_all
-  end
 
   context '.insert' do
     it 'defines and inserts a new class inheriting from Miwomi::Finder' do

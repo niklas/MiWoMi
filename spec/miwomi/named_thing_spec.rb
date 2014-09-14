@@ -27,8 +27,26 @@ describe Miwomi::NamedThing do
     end
 
     it 'removes kill words' do
+      subject.stub klass: 'common.block.BlockAdv'
+      subject.descriptive_klass.should_not =~ /block/i
+      subject.descriptive_klass.should_not include('..')
+    end
+
+    it 'removes kill word plurals' do
       subject.stub klass: 'common.blocks.BlockAdv'
       subject.descriptive_klass.should_not =~ /block/i
+      subject.descriptive_klass.should_not include('.s.')
+      subject.descriptive_klass.should_not include('..')
+    end
+
+    it 'removes surrounding dots from kill worlds' do
+      subject.stub klass: 'lapis.block'
+      subject.descriptive_klass.should == 'lapis'
+    end
+
+    it 'removes surrounding underscores from kill worlds' do
+      subject.stub klass: 'lapis_block'
+      subject.descriptive_klass.should == 'lapis'
     end
   end
 

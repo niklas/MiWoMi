@@ -56,7 +56,7 @@ module Miwomi
       block
       minecraft
     ).map(&:downcase)
-    KillWordsExpr = /(?:#{KillWords.join('|')})/i
+    KillWordsExpr = /[_\.]*(?:#{KillWords.join('s?|')})[_\.]*/i
     def remove_kill_words(m)
       m.gsub!(KillWordsExpr, '')
     end

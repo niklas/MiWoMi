@@ -160,7 +160,7 @@ module Miwomi
     end
 
     def find_match(source)
-      matcher = Matcher.new(source)
+      matcher = Matcher.new(source, list: to)
       matcher.run
       candidates = matcher.candidates
 

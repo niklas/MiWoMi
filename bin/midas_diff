@@ -103,6 +103,11 @@ if __FILE__ == $0
      options.output_filename = v
    end
 
+   opts.on '-i', '--[no-]interactive', "Follow the hints to avoid restarting.\nImplies -s with automatic filename" do |v|
+     options.auto_progress_path = v
+     options.interactive = v
+   end
+
 
     opts.separator ""
     opts.separator "Common options:"

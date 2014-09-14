@@ -223,6 +223,24 @@ describe Miwomi::Patch do
     end
   end
 
+  describe '#progress_path' do
+    it 'is generated automatically if requested' do
+      options.auto_progress_path = true
+
+      name = double
+      subject.stub(:automatic_filename).with('yaml') { name }
+      subject.progress_path.should == name
+    end
+    it 'is not generated automatically unless requested' do
+      subject.progress_path.should be_blank
+    end
+    it 'can be specified' do
+      name = 'exactly_here.mamamidas'
+      options.progress_path = name
+      subject.progress_path.should == name
+    end
+  end
+
   describe '#automatic_filename' do
     it 'generates filename with given extension' do
       subject.send(:automatic_filename, 'plopp').should =~ /^\w{40}\.plopp$/

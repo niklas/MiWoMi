@@ -69,6 +69,8 @@ module Miwomi
         options.progressbar = false
         options.output_filename = nil
         options.progress_path = nil
+        options.auto_progress_path = false
+        options.interactive = false
       end
     end
 
@@ -104,7 +106,7 @@ module Miwomi
         end
       end
     ensure
-      save
+      save if options.interactive || options.progress_path || options.auto_progress_path
       progressbar.stop if options.progressbar
     end
 
@@ -129,7 +131,11 @@ module Miwomi
       options.output_filename || automatic_filename('midas')
     end
 
-    def save(path=options.progress_path)
+    def progress_path
+      options.progress_path || (options.auto_progress_path && automatic_filename('yaml'))
+    end
+
+    def save(path=progress_path)
       if path
         File.open path, 'w' do |f|
           f.write to_yaml
@@ -137,7 +143,7 @@ module Miwomi
       end
     end
 
-    def resume(path=options.progress_path)
+    def resume(path=progress_path)
       if path && File.exist?(path)
         parsed = YAML.load File.read(path)
         if p = parsed.fetch('translations')

@@ -1,5 +1,5 @@
 Miwomi::Finder.insert do
-  source_attribute :name
+  source_attribute :descriptive_name
   candidate_attribute :name_without_namespace
   weight 2
 

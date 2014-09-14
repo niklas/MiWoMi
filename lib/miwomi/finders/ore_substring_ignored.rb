@@ -1,5 +1,5 @@
 Miwomi::Finder.insert do
-  attribute :name
+  attribute :descriptive_name
   weight 2
 
   words do |value|

@@ -34,6 +34,8 @@ module Miwomi
           raise "finder did return nil, should return at least empty array: #{finder}"
         end
 
+        # TODO recalculate results for alternatives here
+
         results.each do |result|
           found! finder, result, 1
 
@@ -63,7 +65,7 @@ module Miwomi
       weights = weighted_candidates(false)
       # if the first one weights much more than the second, use it
       winner = weights[0]
-      if winner[1] > 1 && winner[1] > weights[1][1] * 3
+      if winner[1] > 1 && winner[1] > weights[1][1] * 1.9
         return winner[0]
       end
     end

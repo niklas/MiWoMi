@@ -1,6 +1,6 @@
 Miwomi::Finder.insert do
-  attribute :name
-  weight 2
+  attribute :descriptive_name
+  weight 5
 
   words do |value|
     value.scan(/\w+/i).reverse

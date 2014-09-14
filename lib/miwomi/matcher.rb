@@ -14,6 +14,9 @@ module Miwomi
     end
 
     class Candidate < Struct.new(:thing, :weight)
+      def finders
+        @finders ||= Set.new
+      end
     end
 
     def candidates_by_finder
@@ -54,7 +57,7 @@ module Miwomi
         candidate_by_result.
           to_a.
           inject(counter) do |c,(result,candidate)|
-            c[result] = candidate.weight
+            c[candidate] = candidate.weight
             c
           end.
           sort_by { |k,v| -v }
@@ -65,15 +68,23 @@ module Miwomi
       weights = weighted_candidates(false)
       # if the first one weights much more than the second, use it
       winner = weights[0]
-      if winner[1] > 1 && winner[1] > weights[1][1] * 1.9
-        return winner[0]
+      w = winner[1]
+      n = weights[1][1]
+      if w > 10 && w > n + 10
+        return winner[0].thing
       end
     end
 
     def write_candidates_hint(io)
       io << %Q~best candidates:~
-      weighted_candidates(false).first(5).each do |thing, weight|
-        io << '% 5i: %s' % [weight,thing]
+      weighted_candidates(false).first(5).each do |candidate, weight|
+        io << "% 5i: %s" % [weight,candidate.thing]
+        finders = candidate.finders.
+          sort_by(&:weight).
+          reverse.
+          map(&:internal_name_with_weight).
+          join(', ')
+        io << "       #{finders}"
       end
     end
 
@@ -102,6 +113,7 @@ module Miwomi
       else
         candidate = candidate_by_result[result] = Candidate.new(result, w)
       end
+      candidate.finders << finder
       candidates_by_finder[finder] << candidate
     end
 

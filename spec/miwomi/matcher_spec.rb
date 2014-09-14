@@ -6,7 +6,7 @@ describe Miwomi::Matcher do
   end
 
   def finder(attrs={})
-    double('Finder', {weight: 1}.merge(attrs))
+    double('Finder', {weight: 1, internal_name_with_weight: 'hihi:23'}.merge(attrs))
   end
   let(:a) { t('a') }
   let(:b) { t('b') }
@@ -38,6 +38,10 @@ describe Miwomi::Matcher do
       cands[d].weight.should == 2
       cands[e].should be_nil
       cands[f].weight.should == 2
+
+      subject.candidates.each do |candidates|
+        candidates.finders.should_not be_empty
+      end
     end
   end
 
@@ -63,14 +67,17 @@ describe Miwomi::Matcher do
     end
 
     context '#weighted_candidates' do
+      def gna(thing)
+        subject.candidate_by_result[thing]
+      end
       it "just counts the candidates' occurrences" do
         subject.weighted_candidates(true).should be_hash_matching(
-          a => 10,
-          b => 5,
-          d => 4,
-          c => 1,
-          e => 1,
-          f => 3,
+          gna(a) => 10,
+          gna(b) => 5,
+          gna(d) => 4,
+          gna(c) => 1,
+          gna(e) => 1,
+          gna(f) => 3,
         )
         # sorting is lost on rehashing
       end
@@ -85,11 +92,11 @@ describe Miwomi::Matcher do
         x[0].should == 'OK go'
         x[1].should == 'best candidates:'
         x[2].should == '   10: a'
-        x[3].should == '    5: b'
-        x[4].should == '    4: d'
-        x[5].should == '    3: f'
-        x[6].should == '    1: e' # sort of random...
-        x[7].should be_nil
+        x[4].should == '    5: b'
+        x[6].should == '    4: d'
+        x[8].should == '    3: f'
+        x[10].should == '    1: e' # sort of random...
+        x[12].should be_nil
       end
     end
   end

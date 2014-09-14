@@ -164,6 +164,10 @@ module Miwomi
       matcher.run
       candidates = matcher.candidates
 
+      if candidates.length == 1
+        return candidates.first.thing
+      end
+
       if candidates.length > 1
         if best = matcher.best_candidate
           return best
@@ -171,10 +175,6 @@ module Miwomi
           matcher.write_results_by_finder(hints)
           matcher.write_candidates_hint(hints)
         end
-      end
-
-      if candidates.length == 1
-        return candidates.first.thing
       end
 
       hints << argument_hint(source)

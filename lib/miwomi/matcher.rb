@@ -84,6 +84,7 @@ module Miwomi
             false                            ## better diffs
           return top
         elsif nxt == source               || # close miss
+            (nxt_weight = 0 && top_weight > nxt_weight) || # no other candidates
             false
           return nxt
         end

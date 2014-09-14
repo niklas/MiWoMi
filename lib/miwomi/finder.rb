@@ -111,7 +111,7 @@ module Miwomi
     def words
       @words ||= begin
         builder = configuration.fetch(:word_builder) { ->(x) {x} }
-        builder[source.public_send(source_attribute)]
+        instance_exec source.public_send(source_attribute), &builder
       end
     end
     def has_words?

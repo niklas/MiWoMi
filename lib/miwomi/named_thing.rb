@@ -55,6 +55,7 @@ module Miwomi
       tile
       block
       minecraft
+      ore
     ).map(&:downcase)
     KillWordsExpr = /[_.]*(?:#{KillWords.join('|')})[_.]*/i
     def remove_kill_words(m)

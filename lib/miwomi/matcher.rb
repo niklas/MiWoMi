@@ -8,14 +8,18 @@ module Miwomi
     end
 
     def candidates
-      candidates_by_finder.values
+      candidate_by_result.values.flatten
     end
 
     class Candidate < Struct.new(:thing, :weight)
     end
 
     def candidates_by_finder
-      @candidates ||= Hash.new {|h,v| h[v] = [] }
+      @candidates_by_finder ||= Hash.new {|h,v| h[v] = [] }
+    end
+
+    def candidate_by_result
+      @candidate_by_result ||= Hash.new
     end
 
     def run
@@ -50,7 +54,7 @@ module Miwomi
           to_a.
           inject(counter) do |c,(finder,candidates)|
             candidates.each do |cand|
-            c[cand.thing] += cand.weight
+              c[cand.thing] += 1
             end
             c
           end.
@@ -78,7 +82,12 @@ module Miwomi
   private
 
     def found!(finder, result, weight)
-      candidates_by_finder[finder] << Candidate.new(result, weight)
+      if candidate = candidate_by_result[result]
+        candidate.weight += weight
+      else
+        candidate = candidate_by_result[result] = Candidate.new(result, weight)
+      end
+      candidates_by_finder[finder] << candidate
     end
 
   end

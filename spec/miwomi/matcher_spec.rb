@@ -4,6 +4,13 @@ describe Miwomi::Matcher do
   def t(id=nil,attrs={})
     double('NamedThing', {id: id || attrs.object_id, to_s: id}.merge(attrs))
   end
+  let(:a) { t('a') }
+  let(:b) { t('b') }
+  let(:c) { t('c') }
+  let(:d) { t('d') }
+  let(:e) { t('e') }
+  let(:f) { t('f') }
+
 
   let(:source) { t() }
   subject { described_class.new source }
@@ -14,23 +21,24 @@ describe Miwomi::Matcher do
 
   context '#run' do
     subject { described_class.new source, finders: finders }
-    let(:found) { double 'Finder', internal_name: 'even', results: [t(2),t(4),t(6)]}
-    let(:not_found) { double 'Finder' , internal_name: 'counting', results: [t(1),t(2),t(3)]}
-    let(:finders) { [found, not_found, found] }
+    let(:found) { double 'Finder', internal_name: 'even', results: [b, d, f]}
+    let(:found_other) { double 'Finder' , internal_name: 'counting', results: [a,b,c]}
+    let(:finders) { [found, found_other, found] }
     it 'goes through all finders and records candidates' do
-      expect { subject.run }.to change { subject.candidates.length }.from(0).to(2)
+      expect { subject.run }.to change { subject.candidates.length }.from(0).to(5) # all but 'e'
+
+      cands = subject.candidate_by_result
+      cands[a].weight.should == 1
+      cands[b].weight.should == 3
+      cands[c].weight.should == 1
+      cands[d].weight.should == 2
+      cands[e].should be_nil
+      cands[f].weight.should == 2
     end
   end
 
 
   context '#candidates' do
-    let(:a) { t('a') }
-    let(:b) { t('b') }
-    let(:c) { t('c') }
-    let(:d) { t('d') }
-    let(:e) { t('e') }
-    let(:f) { t('f') }
-
     def found!(fi,r,w=1)
       subject.send :found!, fi, r, w
     end

@@ -181,10 +181,13 @@ module Miwomi
       matcher.run
       candidates = matcher.candidates
       if candiates.length > 1
-        matcher.write_candidates_hint(hint)
+        matcher.write_candidates_hint(hints)
       end
 
-      found = found.sort.uniq
+      if candidates.length == 1
+        return candidates.first.thing
+      end
+
       if 1 < found.length && found.length < 13
         hints << argument_hint(source)
         raise AmbigousMatch, "could not find fuzzy match for #{source} " +

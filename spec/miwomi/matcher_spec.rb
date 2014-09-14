@@ -1,22 +1,15 @@
 require 'spec_helper'
 
 describe Miwomi::Matcher do
-  def t(id=nil,attrs={})
-    double('NamedThing', {id: id || attrs.object_id, to_s: id}.merge(attrs))
-  end
-
-  def finder(attrs={})
-    double('Finder', {weight: 1, internal_name_with_weight: 'hihi:23'}.merge(attrs))
-  end
-  let(:a) { t('a') }
-  let(:b) { t('b') }
-  let(:c) { t('c') }
-  let(:d) { t('d') }
-  let(:e) { t('e') }
-  let(:f) { t('f') }
+  let(:a) { thing('a') }
+  let(:b) { thing('b') }
+  let(:c) { thing('c') }
+  let(:d) { thing('d') }
+  let(:e) { thing('e') }
+  let(:f) { thing('f') }
 
 
-  let(:source) { t() }
+  let(:source) { thing() }
   subject { described_class.new source }
 
   it 'has a source' do

@@ -31,8 +31,24 @@ module RSpec
   end
 end
 
+module StubbedFactorySpecHelpers
+  def thing(id=nil, attrs={})
+    if id.is_a?(Hash)
+      attrs = id
+      id = nil
+    end
+    double('NamedThing', {id: id || attrs.object_id, to_s: id}.merge(attrs))
+  end
+
+  def finder(attrs={})
+    double('Finder', {weight: 1, internal_name_with_weight: 'hihi:23'}.merge(attrs))
+  end
+end
+
 RSpec.configure do |config|
   config.before :each do
     Miwomi::Finder.undefine_all
   end
+
+  config.include StubbedFactorySpecHelpers
 end

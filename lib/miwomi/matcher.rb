@@ -50,12 +50,10 @@ module Miwomi
     def weighted_candidates(rehash=false)
       counter = Hash.new { |h,k| h[k] = 0 }
       @counted ||=
-        candidates_by_finder.
+        candidate_by_result.
           to_a.
-          inject(counter) do |c,(finder,candidates)|
-            candidates.each do |cand|
-              c[cand.thing] += 1
-            end
+          inject(counter) do |c,(result,candidate)|
+            c[result] = candidate.weight
             c
           end.
           sort_by { |k,v| -v }
@@ -74,8 +72,8 @@ module Miwomi
       found_count = weighted_candidates
 
       io << %Q~best candidates:~
-      weighted_candidates(false).first(5).each do |thing, count|
-        io << %Q~  #{count}: #{thing}~
+      weighted_candidates(false).first(5).each do |thing, weight|
+        io << '% 5i: %s' % [weight,thing]
       end
     end
 

@@ -132,7 +132,7 @@ describe Miwomi::Patch do
         to << block(600, 'blockAlloy')
         to << block(601, 'blockAlloyGlass')
 
-        should translate_id(600).to(600)
+        should translate_nothing # is kept
       end
     end
 

@@ -11,6 +11,7 @@ gem 'pry'
 gem 'rspec'
 gem 'guard', "~> 2.3.0"
 gem "guard-rspec", "~> 4.2.5"
+gem 'diff_matcher'
 
   # Needed by Guard to monitor files and provide notifications
 gem 'libnotify', require: false

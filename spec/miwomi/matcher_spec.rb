@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Miwomi::Matcher do
-  def t(attrs={})
-    double('NamedThing', {id: attrs.object_id}.merge(attrs))
+  def t(id=nil,attrs={})
+    double('NamedThing', {id: id || attrs.object_id, to_s: id}.merge(attrs))
   end
 
   let(:source) { t() }
@@ -14,11 +14,68 @@ describe Miwomi::Matcher do
 
   context '#run' do
     subject { described_class.new source, finders: finders }
-    let(:found) { double 'Finder', internal_name: 'even', results: [t(id: 2),t(id: 4),t(id: 6)]}
-    let(:not_found) { double 'Finder' , internal_name: 'counting', results: [t(id: 1),t(id: 2),t(id: 3)]}
+    let(:found) { double 'Finder', internal_name: 'even', results: [t(2),t(4),t(6)]}
+    let(:not_found) { double 'Finder' , internal_name: 'counting', results: [t(1),t(2),t(3)]}
     let(:finders) { [found, not_found, found] }
     it 'goes through all finders and records candidates' do
       expect { subject.run }.to change { subject.candidates.length }.from(0).to(2)
+    end
+  end
+
+
+  context '#candidates' do
+    let(:a) { t('a') }
+    let(:b) { t('b') }
+    let(:c) { t('c') }
+    let(:d) { t('d') }
+    let(:e) { t('e') }
+    let(:f) { t('f') }
+
+    def found!(fi,r,w=1)
+      subject.send :found!, fi, r, w
+    end
+
+    before :each do
+      found! 'Z', a
+      found! 'Z', b
+      found! 'Z', c
+      found! 'Y', b
+      found! 'Y', d
+      found! 'Y', e
+      found! 'Z', b
+      found! 'Z', d
+      found! 'Z', f
+    end
+
+    context '#weighted_candidates' do
+      it "just counts the candidates' occurrences" do
+        subject.weighted_candidates(true).should be_hash_matching(
+          a => 1,
+          b => 3,
+          d => 2,
+          c => 1,
+          e => 1,
+          f => 1,
+        )
+        # sorting is lost on rehashing
+      end
+
+      it "considers the weight of the recorded match"
+    end
+
+    context '#write_candidates_hint' do
+      it 'lists the top 5 candidates' do
+        x = ['OK go']
+        subject.write_candidates_hint(x)
+        x[0].should == 'OK go'
+        x[1].should == 'best candidates:'
+        x[2].should == '  3: b'
+        x[3].should == '  2: d'
+        x[4].should == '  1: a'
+        x[5].should == '  1: c'
+        x[6].should == '  1: f' # sort of random...
+        x[7].should be_nil
+      end
     end
   end
 

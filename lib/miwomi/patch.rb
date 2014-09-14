@@ -178,24 +178,10 @@ module Miwomi
 
     def find_match(source)
       matcher = Matcher.new(source)
-
-
-      if found.length > 1
-        # count how often each block was found
-        found_count = found.
-          inject( Hash.new { |h,k| h[k] = 0 }) { |i,b| i[b]+=1; i}.
-          sort_by { |k,v| -v }
-
-        # if the first one was found more often then the second, use it
-        winner = found_count[0]
-        if winner[1] > 1 && winner[1] > found_count[1][1]
-          return winner[0]
-        else
-          hints << %Q~best candidates:~
-          found_count.first(5).each do |thing, count|
-            hints << %Q~  #{count}: #{thing}~
-          end
-        end
+      matcher.run
+      candidates = matcher.candidates
+      if candiates.length > 1
+        matcher.write_candidates_hint(hint)
       end
 
       found = found.sort.uniq

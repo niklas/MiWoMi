@@ -4,10 +4,14 @@ module Miwomi
     def initialize(source, options={})
       @source = source
       @finders = options.fetch(:finders) { Finder.all_for(source) }
+      @runNing = false
     end
 
     def candidates
       candidates_by_finder.values
+    end
+
+    class Candidate < Struct.new(:thing, :weight)
     end
 
     def candidates_by_finder
@@ -39,10 +43,42 @@ module Miwomi
       end
     end
 
+    def weighted_candidates(rehash=false)
+      counter = Hash.new { |h,k| h[k] = 0 }
+      @counted ||=
+        candidates_by_finder.
+          to_a.
+          inject(counter) do |c,(finder,candidates)|
+            candidates.each do |cand|
+            c[cand.thing] += cand.weight
+            end
+            c
+          end.
+          sort_by { |k,v| -v }
+      rehash ? Hash[@counted] : @counted
+    end
+
+    def best_candidate
+      # if the first one was found more often then the second, use it
+      winner = found_count[0]
+      if winner[1] > 1 && winner[1] > found_count[1][1]
+        return winner[0]
+      end
+    end
+
+    def write_candidates_hint(io)
+      found_count = weighted_candidates
+
+      io << %Q~best candidates:~
+      weighted_candidates(false).first(5).each do |thing, count|
+        io << %Q~  #{count}: #{thing}~
+      end
+    end
+
   private
 
     def found!(finder, result, weight)
-      candidates_by_finder[finder] << result
+      candidates_by_finder[finder] << Candidate.new(result, weight)
     end
 
   end

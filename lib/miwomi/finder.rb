@@ -102,7 +102,8 @@ module Miwomi
       configuration[:word_builder] = block
     end
     def words
-      configuration.fetch(:word_builder) { ->(x) {x} }[source.public_send(source_attribute)]
+      builder = configuration.fetch(:word_builder) { ->(x) {x} }
+      builder[source.public_send(source_attribute)]
     end
     def has_words?
       configuration.has_key?(:word_builder)

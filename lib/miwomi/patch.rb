@@ -67,6 +67,7 @@ module Miwomi
         options.drop  = []
         options.drop_ids  = []
         options.keep_ids  = []
+        options.move_ids  = {}
         options.alternatives = []
         options.verbose = false
         options.progressbar = false
@@ -79,6 +80,10 @@ module Miwomi
       @translations = []
       from.each do |source|
         progressbar.increment if options.progressbar
+        if requested = options.move_ids[source.id]
+          found_translation_by_id(source, requested)
+          next
+        end
         next if TechnicalBlocks.include?(source.id)
         next if options.keep_ids.include?(source.id)
         drop(source) && next if options.drop_ids.include?(source.id)
@@ -133,6 +138,10 @@ module Miwomi
         $stderr.puts translation.to_midas
       end
       @translations << translation
+    end
+
+    def found_translation_by_id(source, id)
+      found_translation source, to.find_by_id(id)
     end
 
     def drop(source)

@@ -46,7 +46,7 @@ if __FILE__ == $0
       "  -d 4,8,15,16,23,42",
       "  -d 23-42",
       "  -d 666,6-66",
-      "  they will vanish into thin air",
+      "  they won't be touched",
       Array do |list|
       list.each do |item|
         case item
@@ -58,6 +58,20 @@ if __FILE__ == $0
           end
         else
           raise "cannot understand how to keep #{item.inspect}"
+        end
+      end
+    end
+
+    opts.on '-m', '--move x-y,y-z',
+      "Move blocks/items where x,y,z are ids",
+      "  -d 23-42,42-23",
+      "  When you know what you want. Circular swaps are allowed.",
+      Array do |list|
+      list.each do |item|
+        if item =~ /^(\d+)-(\d+)$/
+          options.move_ids[$1.to_i] = $2.to_i
+        else
+          raise "cannot understand how to move #{item.inspect}"
         end
       end
     end

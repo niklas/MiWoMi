@@ -3,6 +3,8 @@ require 'monads/optional'
 
 module Miwomi
   class Finder
+    include Logger
+
     def self.all
       @all ||= []
     end
@@ -102,8 +104,10 @@ module Miwomi
       configuration[:word_builder] = block
     end
     def words
-      builder = configuration.fetch(:word_builder) { ->(x) {x} }
-      builder[source.public_send(source_attribute)]
+      @words ||= begin
+        builder = configuration.fetch(:word_builder) { ->(x) {x} }
+        builder[source.public_send(source_attribute)]
+      end
     end
     def has_words?
       configuration.has_key?(:word_builder)

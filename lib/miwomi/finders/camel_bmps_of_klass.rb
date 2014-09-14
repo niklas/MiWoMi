@@ -1,7 +1,6 @@
 Miwomi::Finder.insert do
-  words do
-    source.
-      klass.
+  words do |value|
+    value.
       underscore.
       scan(/[[:alnum:]]+/i).
       map(&:downcase).

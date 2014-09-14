@@ -164,7 +164,7 @@ module Miwomi
       matcher.run
       candidates = matcher.candidates
 
-      if candiates.length > 1
+      if candidates.length > 1
         if best = matcher.best_candidate
           return best
         else

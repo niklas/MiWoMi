@@ -84,8 +84,8 @@ module Miwomi
           found_translation_by_id(source, requested)
           next
         end
-        next if TechnicalBlocks.include?(source.id)
-        next if options.keep_ids.include?(source.id)
+        keep(source) && next if TechnicalBlocks.include?(source.id)
+        keep(source) && next if options.keep_ids.include?(source.id)
         drop(source) && next if options.drop_ids.include?(source.id)
         drop(source) && next if options.drop.any? { |ign| source.name.include?(ign) }
         if to.find { |t| t.id == source.id && t.name == 'tile.ForgeFiller' }
@@ -97,7 +97,7 @@ module Miwomi
           end
 
           if source == match
-            next
+            keep(source) && next
           end
 
           found_translation(source, match)
@@ -146,6 +146,10 @@ module Miwomi
 
     def drop(source)
       found_translation source, source.class.new( 0, "dropped")
+    end
+
+    def keep(source)
+      # TODO store for resume
     end
 
     def find_match(source)

@@ -20,6 +20,14 @@ RSpec::Matchers.define :translate_id do |from_id|
       "could not find a translation for id: #{from_id}"
     end
   end
+
+  failure_message_for_should_not do |patch|
+    if @translation
+      "expected to not translate #{from_id}, but translated to #{@translation.to.id}"
+    else
+      "erm"
+    end
+  end
 end
 
 RSpec::Matchers.define :fail_translating do |from_id|
@@ -38,7 +46,12 @@ end
 RSpec::Matchers.define :translate_nothing do
   match do |patch|
     patch.apply
-    patch.translations.empty?
+    @translations = patch.translations
+    @translations.empty?
+  end
+
+  failure_message_for_should do |patch|
+    "should not translate anything, but did:\n#{@translations.map(&:to_midas).join("\n")}"
   end
 end
 

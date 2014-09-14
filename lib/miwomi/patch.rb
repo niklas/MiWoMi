@@ -144,6 +144,7 @@ module Miwomi
 
     def keep(source)
       # TODO store for resume
+      true
     end
 
     def find_match(source)

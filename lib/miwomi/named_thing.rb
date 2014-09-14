@@ -17,7 +17,7 @@ module Miwomi
     def to_s
       k = descriptive_klass.to_s
       k = " [#{k}]" unless k.empty?
-      %Q~<#{short_class_name} #{name.inspect} (#{id})#{k}>~
+      %Q~<#{short_class_name} #{descriptive_name.inspect} (#{id})#{k}>~
     end
 
     def short_class_name
@@ -31,12 +31,14 @@ module Miwomi
     def descriptive_name
       @descriptive_name ||= name.dup.tap do |m|
         m.sub! /^([\w_]+):/i, ''
+        remove_kill_words(m)
       end
     end
 
     def descriptive_klass
       @descriptive_klass ||= (klass.presence || '').tap do |m|
         m.sub! 'net.minecraft.block.', ''
+        remove_kill_words(m)
       end
     end
 
@@ -47,6 +49,16 @@ module Miwomi
         else
           name
         end
+    end
+  private
+    KillWords = %w(
+      tile
+      block
+      minecraft
+    ).map(&:downcase)
+    KillWordsExpr = /(?:#{KillWords.join('|')})/i
+    def remove_kill_words(m)
+      m.gsub!(KillWordsExpr, '')
     end
   end
 end

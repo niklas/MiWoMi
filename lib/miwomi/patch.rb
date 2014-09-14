@@ -183,16 +183,6 @@ module Miwomi
       @hints ||= []
     end
 
-    KillWords = %w(
-      tile
-      block
-      minecraft
-    ).map(&:downcase)
-    def is_kill_word?(word)
-      KillWords.include? word.downcase
-    end
-
-
     def argument_hint(source)
       if identical = to.find_by_id(source)
         hint = <<-EOTXT

@@ -92,6 +92,7 @@ module Miwomi
         end
         if match = find_match(source)
           unless match.is_a?(source.class)
+            next if [:moved, :kept, :dropped].include?(match)
             raise IncompatibeType, "cannot translate #{source} into #{match}"
           end
 
@@ -199,6 +200,11 @@ module Miwomi
       if candidates.length > 1
         if best = matcher.best_candidate
           return best
+        elsif options.interactive
+          if solved = make_interactive_choice(matcher)
+            return solved
+          end
+
         else
           matcher.write_results_by_finder(hints)
           matcher.write_candidates_hint(hints)
@@ -250,6 +256,50 @@ If you don't care about the block
   #{source}
 add -d #{source.id} to drop it.
 EOTXT
+      end
+    end
+
+    def make_interactive_choice(matcher)
+      if options.interactive
+        source = matcher.source
+        $stdout.puts
+        matcher.write_results_by_finder($stdout, true)
+        matcher.write_candidates_hint($stdout, true)
+
+        require 'highline/import'
+        say("\nCould not find fuzzy match for #{source}")
+        solved = false
+        until solved do
+          choose do |menu|
+            menu.layout = :menu_only
+
+            menu.shell  = true
+
+            menu.choice(:keep, 'Keep it unchanged.') do |command, details|
+              keep(source)
+              solved = :kept
+            end
+
+            menu.choice(:move, 'Provide a new block id to move to.') do |command, details|
+              num = details.to_i
+              if num > 0
+                found_translation_by_id(source, details)
+                solved = :moved
+              else
+                say "not a block id: #{details}\n"
+              end
+            end
+
+            menu.choice(:drop, 'Drop/Delete it.') do |command, details|
+              drop(source)
+              solved = :dropped
+            end
+
+            menu.choice(:quit, "Exit program.") { return false }
+          end
+        end
+        say("#{solved}\n") if solved
+        return solved
       end
     end
   end

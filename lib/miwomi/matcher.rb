@@ -91,22 +91,26 @@ module Miwomi
       end
     end
 
-    def write_candidates_hint(io)
+    def write_candidates_hint(io, newline=false)
       io << %Q~best candidates:~
+      io << "\n" if newline
       weighted_candidates(false).first(5).each do |candidate, weight|
         io << "% 5i: %s" % [weight,candidate.thing]
+        io << "\n" if newline
         finders = candidate.finders.
           sort_by(&:weight).
           reverse.
           map(&:internal_name_with_weight).
           join(', ')
         io << "       #{finders}"
+        io << "\n" if newline
       end
     end
 
-    def write_results_by_finder(io)
+    def write_results_by_finder(io, newline=false)
       indent = lambda { |f| "    #{f}" }
       io << 'tried:'
+      io << "\n" if newline
       candidates_by_finder.map do |finder, candidates|
         name = finder.internal_name
         found = candidates.map(&:thing)
@@ -117,7 +121,10 @@ module Miwomi
         else
           found.map(&indent)
         end
-      end.each { |l| io << l }
+      end.flatten.each do |l|
+        io << l
+        io << "\n" if newline
+      end
     end
 
   private

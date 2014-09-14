@@ -126,7 +126,7 @@ module Miwomi
     end
 
     def output_filename
-      options[:output_filename] || output_filename_from_collections
+      options.output_filename || automatic_filename('midas')
     end
 
     def save(path=options.progress_path)
@@ -221,9 +221,9 @@ module Miwomi
       @progressbar ||= ProgressBar.create title: 'mining..', total: from.length, format: "%t %p%%: |%B|"
     end
 
-    def output_filename_from_collections
-      hash = Digest::SHA1.hexdigest from.inspect + to.inspect
-      "#{hash}.midas"
+    def automatic_filename(ext='data')
+      hash = Digest::SHA1.hexdigest [from, to].map(&:inspect).reduce(&:+)
+      "#{hash}.#{ext}"
     end
 
     def hints

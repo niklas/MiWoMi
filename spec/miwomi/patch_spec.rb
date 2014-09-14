@@ -212,13 +212,20 @@ describe Miwomi::Patch do
 
   describe '#output_filename' do
     it 'is generated automatically' do
-      subject.stub from: %w(bar), to: %w(foo)
-      subject.output_filename.should =~ /^\w{40}\.midas$/
+      name = double
+      subject.stub(:automatic_filename).with('midas') { name }
+      subject.output_filename.should == name
     end
     it 'can be specified' do
       name = 'exactly_here.mamamidas'
       options.output_filename = name
       subject.output_filename.should == name
+    end
+  end
+
+  describe '#automatic_filename' do
+    it 'generates filename with given extension' do
+      subject.send(:automatic_filename, 'plopp').should =~ /^\w{40}\.plopp$/
     end
   end
 

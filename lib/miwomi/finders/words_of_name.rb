@@ -3,7 +3,7 @@ Miwomi::Finder.insert do
   weight 4
 
   words do |value|
-    value.scan(/\w+/i).reverse
+    value.underscore.scan(/\b\w+\b/i).reverse
   end
 
   match_word do |word, value|

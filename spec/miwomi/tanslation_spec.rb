@@ -1,6 +1,6 @@
 require 'miwomi'
 
-describe Miwomi::Patch::Translation do
+describe Miwomi::Translation do
   let(:from) { double('FromBlock').as_null_object }
   let(:to)   { double('ToBlock').as_null_object }
   subject { described_class.new from, to }

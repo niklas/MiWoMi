@@ -25,12 +25,6 @@ module Miwomi
     class IncompatibeType < Error
     end
 
-    class Translation < Struct.new(:from, :to)
-      def to_midas
-        %Q~# #{from.name} => #{to.name}\n#{from.id} -> #{to.id}~
-      end
-    end
-
     # some blocks are internal, see http://minecraft.gamepedia.com/Technical_blocks
     TechnicalBlocks = [
       26,   # Bed

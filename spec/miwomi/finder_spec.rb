@@ -59,8 +59,9 @@ describe Miwomi::Finder do
           words { |source| source.split }
         end.new
 
-        f.stub source: 'foo bar'
+        f.stub source: double(name: 'foo bar')
         f.words.should == ['foo', 'bar']
+        f.should have_words
       end
 
       it 'can define attribute to call on candidates and source' do
@@ -99,6 +100,16 @@ describe Miwomi::Finder do
 
         f.should be_word_matches_value('x', 'X')
       end
+
+      it 'can match the pure attributes' do # for customization
+        f = described_class.insert do
+          match_value do |w,v|
+            w == v.downcase
+          end
+        end.new
+
+        f.should be_value_matches_value('x', 'X')
+      end
     end
 
   end
@@ -119,6 +130,39 @@ describe Miwomi::Finder do
     it 'loads some finders' do
       described_class.load_all
       described_class.all.should have_at_least(1).items
+    end
+  end
+
+  context '#candidate?' do
+    context 'for words' do
+      subject { described_class.insert {
+        words { |v| v.split('') }
+        match_word { |w,v| v.include?(w) }
+      }.new(source) }
+      let(:source) { double(name: 'usB') }
+
+      it 'approves candidate with matching word in #name' do
+        subject.should be_candidate( double(name: 'USB') )
+      end
+
+      it 'disapproves candidate without matching word in #name' do
+        subject.should_not be_candidate( double(name: 'USA') )
+      end
+    end
+
+    context 'for value' do
+      subject { described_class.insert {
+        match_value { |e,v| e.downcase == v.downcase }
+      }.new(source) }
+      let(:source) { double(name: 'usB') }
+
+      it 'approves candidate with matching value of #name' do
+        subject.should be_candidate( double(name: 'USB') )
+      end
+
+      it 'disapproves candidate without matching value of #name' do
+        subject.should_not be_candidate( double(name: 'USA') )
+      end
     end
   end
 

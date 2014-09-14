@@ -2,9 +2,13 @@ require 'pathname'
 require 'monads/optional'
 
 module Miwomi
-  class Finder < Struct.new(:source)
+  class Finder
     def self.all
       @all ||= []
+    end
+
+    def self.all_for(source, options={})
+      all.map { |f| f.new(source, options) }
     end
 
     def self.undefine_all
@@ -50,6 +54,31 @@ module Miwomi
       new(source).results
     end
 
+    ######################################################################################
+    # Instance Methods
+    ######################################################################################
+
+    attr_reader :source
+    attr_reader :options
+    def initialize(source=[], options={})
+      @source = source
+      @list = options.fetch(:list) { [] }
+    end
+
+    def results
+      @list.of_type(source).select method(:candidate?)
+    end
+
+    def candidate?(cand)
+      value = cand.public_send(candidate_attribute)
+      if has_words?
+        words.any? do |word|
+          word_matches_value?(word, value)
+        end
+      else
+        value_matches_value? source.public_send(source_attribute), value
+      end
+    end
 
     ######################################################################################
     # DSL
@@ -69,7 +98,10 @@ module Miwomi
       configuration[:word_builder] = block
     end
     def words
-      self.class.configuration.fetch(:word_builder) { ->(x) {x} }[source]
+      configuration.fetch(:word_builder) { ->(x) {x} }[source.public_send(source_attribute)]
+    end
+    def has_words?
+      configuration.has_key?(:word_builder)
     end
 
     def self.attribute(attr_name)
@@ -97,6 +129,15 @@ module Miwomi
     end
     def word_matches_value?(word, value)
       optional(self.class.word_matcher).call(word, value).value
+    end
+
+    class_attribute :value_matcher
+    def self.match_value(&block)
+      ensure_subklass!
+      self.value_matcher = block
+    end
+    def value_matches_value?(mine, theirs)
+      optional(self.class.value_matcher).call(mine, theirs).value
     end
 
 

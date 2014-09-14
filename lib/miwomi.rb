@@ -14,6 +14,7 @@ module Miwomi
   autoload :Item       , 'miwomi/item'
   autoload :Patch      , 'miwomi/patch'
   autoload :Finder     , 'miwomi/finder'
+  autoload :Matcher    , 'miwomi/matcher'
 
   autoload :Collection , 'miwomi/collection'
 

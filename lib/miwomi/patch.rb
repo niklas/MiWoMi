@@ -74,6 +74,7 @@ module Miwomi
     end
 
     def apply
+      Finder.load_all
       @translations = []
       from.each do |source|
         progressbar.increment if options.progressbar
@@ -176,22 +177,7 @@ module Miwomi
     end
 
     def find_match(source)
-      @tried = {}
-      found = finders.map do |finder_name,finder|
-        result = finder[source]
-        unless result
-          raise "finder did return nil, should return at least empty array: #{finder}"
-        end
-        @tried[finder_name] = result
-        if result.length == 1
-          return result.first
-        # matching in some way AND the id is the same? looks like we found it
-        elsif exact = result.find { |f| f.id == source.id }
-          return exact
-        else
-          result
-        end
-      end.flatten.compact
+      matcher = Matcher.new(source)
 
 
       if found.length > 1

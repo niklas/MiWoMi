@@ -55,4 +55,16 @@ describe Miwomi::NamedThing do
     end
   end
 
+  context '#name_words' do
+    it 'works with camels' do
+      subject.stub descriptive_name: 'FuckTheNether'
+      subject.name_words.should == ['fuck', 'the', 'nether']
+    end
+
+    it 'works with dots' do
+      subject.stub descriptive_name: 'fuck.the.nether'
+      subject.name_words.should == ['fuck', 'the', 'nether']
+    end
+  end
+
 end

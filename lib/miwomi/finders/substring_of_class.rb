@@ -1,12 +1,11 @@
 Miwomi::Finder.insert do
-  attribute :descriptive_klass
+  source_attribute :klass_words
+  candidate_attribute :descriptive_klass
   weight 1
 
-  words do |value|
-    value.scan(/\w+/i).reverse
-  end
-
-  match_word do |word, value|
-    value.downcase.include?(word)
+  match_value do |words, value|
+    words.any? do |word|
+      value.downcase.include?(word)
+    end
   end
 end

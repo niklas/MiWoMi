@@ -50,6 +50,14 @@ module Miwomi
           name
         end
     end
+
+    def name_words
+      @name_words ||= words_in descriptive_name
+    end
+
+    def klass_words
+      @klass_words ||= words_in descriptive_klass
+    end
   private
     KillWords = %w(
       tile
@@ -60,6 +68,10 @@ module Miwomi
     KillWordsExpr = /[_.]*(?:#{KillWords.join('|')})[_.]*/i
     def remove_kill_words(m)
       m.gsub!(KillWordsExpr, '')
+    end
+
+    def words_in(s)
+      s.underscore.split(/[_.]/)
     end
   end
 end

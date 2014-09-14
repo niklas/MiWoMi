@@ -48,6 +48,11 @@ describe Miwomi::NamedThing do
       subject.stub klass: 'lapis_block'
       subject.descriptive_klass.should == 'lapis'
     end
+
+    it 'does not clean more than needed' do
+      subject.stub klass: 'net.minecraft.block.BlockStone'
+      subject.descriptive_klass.should == 'Stone'
+    end
   end
 
 end

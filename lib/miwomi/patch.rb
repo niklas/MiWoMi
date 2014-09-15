@@ -267,7 +267,8 @@ EOTXT
         matcher.write_candidates_hint($stdout, true)
 
         require 'highline/import'
-        say("\nCould not find fuzzy match for #{source}")
+        prompt = "\nCould not find fuzzy match for #{source}"
+        say(prompt)
         solved = false
         until solved do
           choose do |menu|
@@ -293,6 +294,12 @@ EOTXT
             menu.choice(:drop, 'Drop/Delete it.') do |command, details|
               drop(source)
               solved = :dropped
+            end
+
+            menu.choice(:all, 'Show all candidates') do |command, details|
+              matcher.write_results_by_finder($stdout, true, 23)
+              matcher.write_candidates_hint($stdout, true, 10)
+              say(prompt)
             end
 
             menu.choice(:quit, "Exit program.") { return false }

@@ -91,10 +91,10 @@ module Miwomi
       end
     end
 
-    def write_candidates_hint(io, newline=false)
+    def write_candidates_hint(io, newline=false, num=5)
       io << %Q~best candidates:~
       io << "\n" if newline
-      weighted_candidates(false).first(5).each do |candidate, weight|
+      weighted_candidates(false).first(num).each do |candidate, weight|
         io << "% 5i: %s" % [weight,candidate.thing]
         io << "\n" if newline
         finders = candidate.finders.
@@ -107,7 +107,7 @@ module Miwomi
       end
     end
 
-    def write_results_by_finder(io, newline=false)
+    def write_results_by_finder(io, newline=false, num=7)
       indent = lambda { |f| "    #{f}" }
       io << 'tried:'
       io << "\n" if newline
@@ -116,8 +116,8 @@ module Miwomi
         found = candidates.map(&:thing)
         [ "  #{name}:" ] +
         if found.length > 7
-          found[0..6].map(&indent) +
-            [ indent["... and #{found.length - 7} more"] ]
+          found.first(num).map(&indent) +
+            [ indent["... and #{found.length - num} more"] ]
         else
           found.map(&indent)
         end

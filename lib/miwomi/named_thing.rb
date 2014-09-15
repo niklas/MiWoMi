@@ -64,6 +64,7 @@ module Miwomi
     end
   private
     KillWords = %w(
+      item
       tile
       block
       minecraft

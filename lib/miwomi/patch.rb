@@ -347,7 +347,7 @@ EOTXT
       case answer
       when 'y', 'd'
         drop(source)
-        say "Deleted.\n"
+        say "\nDeleted.\n"
         return :ok
       else
         return false

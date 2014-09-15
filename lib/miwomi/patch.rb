@@ -138,8 +138,9 @@ module Miwomi
 
     def save(path=progress_path)
       if path
+        data = to_yaml # do not touch file when failing
         File.open path, 'w' do |f|
-          f.write to_yaml
+          f.write data
         end
       end
     end
@@ -293,6 +294,19 @@ EOTXT
                 trans = found_translation_by_id(source, details)
                 say "Moved to #{trans.to}\n"
                 solved = :moved
+              else
+                say "not a block id: #{details}\n"
+              end
+            end
+
+            menu.choice(:top, 'Select the top {num} candidate') do |command, details|
+              num = details.to_i
+              if num > 0
+                if t = matcher.weighted_candidates(false)[num - 1].first
+                  trans = found_translation(source, t.thing)
+                  say "Moved to #{trans.to}\n"
+                  solved = :moved
+                end
               else
                 say "not a block id: #{details}\n"
               end

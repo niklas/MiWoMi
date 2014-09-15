@@ -92,10 +92,11 @@ module Miwomi
     end
 
     def write_candidates_hint(io, newline=false, num=5)
-      io << %Q~best #{num} candidates:~
+      io << %Q~top #{num} candidates:~
       io << "\n" if newline
-      weighted_candidates(false).first(num).each do |candidate, weight|
-        io << "% 5i: %s" % [weight,candidate.thing]
+      weighted_candidates(false).first(num).each_with_index do |(candidate, weight), index|
+        selector = "{#{index+1}}"
+        io << "%s% 5i: %s" % [selector, weight,candidate.thing]
         io << "\n" if newline
         finders = candidate.finders.
           sort_by(&:weight).

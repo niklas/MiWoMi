@@ -82,13 +82,13 @@ describe Miwomi::Matcher do
       it 'lists the top 5 candidates' do
         x = ['OK go']
         subject.write_candidates_hint(x)
-        x[0].should == 'OK go'
-        x[1].should == 'best candidates:'
-        x[2].should == '   10: a'
-        x[4].should == '    5: b'
-        x[6].should == '    4: d'
-        x[8].should == '    3: f'
-        x[10].should == '    1: e' # sort of random...
+        x[0].should  == 'OK go'
+        x[1].should  == 'top 5 candidates:'
+        x[2].should  == '{1}   10: a'
+        x[4].should  == '{2}    5: b'
+        x[6].should  == '{3}    4: d'
+        x[8].should  == '{4}    3: f'
+        x[10].should == '{5}    1: e' # sort of random...
         x[12].should be_nil
       end
     end

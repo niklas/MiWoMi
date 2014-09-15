@@ -92,7 +92,7 @@ module Miwomi
     end
 
     def write_candidates_hint(io, newline=false, num=5)
-      io << %Q~best candidates:~
+      io << %Q~best #{num} candidates:~
       io << "\n" if newline
       weighted_candidates(false).first(num).each do |candidate, weight|
         io << "% 5i: %s" % [weight,candidate.thing]
@@ -115,7 +115,7 @@ module Miwomi
         name = finder.internal_name
         found = candidates.map(&:thing)
         [ "  #{name}:" ] +
-        if found.length > 7
+        if found.length > num
           found.first(num).map(&indent) +
             [ indent["... and #{found.length - num} more"] ]
         else
@@ -125,6 +125,11 @@ module Miwomi
         io << l
         io << "\n" if newline
       end
+    end
+
+    def puts_candidates(num)
+      write_results_by_finder($stdout, true, num * 2)
+      write_candidates_hint($stdout, true, num)
     end
 
   private

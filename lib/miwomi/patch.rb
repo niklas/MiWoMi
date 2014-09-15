@@ -172,6 +172,7 @@ module Miwomi
         $stderr.puts translation.to_midas
       end
       @translations << translation
+      translation
     end
 
     def found_translation_by_id(source, id)
@@ -184,6 +185,10 @@ module Miwomi
 
     def keep(source)
       @keeps << source
+    end
+
+    def aquivalent(source)
+      to.find_by_id(source)
     end
 
     def find_match(source)
@@ -263,8 +268,7 @@ EOTXT
       if options.interactive
         source = matcher.source
         $stdout.puts
-        matcher.write_results_by_finder($stdout, true)
-        matcher.write_candidates_hint($stdout, true)
+        matcher.puts_candidates(limit=5)
 
         require 'highline/import'
         prompt = "\nCould not find fuzzy match for #{source}"
@@ -278,13 +282,16 @@ EOTXT
 
             menu.choice(:keep, 'Keep it unchanged.') do |command, details|
               keep(source)
+              aqui = aquivalent(source)
+              say "Keep it, will be #{aqui}\n"
               solved = :kept
             end
 
             menu.choice(:move, 'Provide a new block id to move to.') do |command, details|
               num = details.to_i
               if num > 0
-                found_translation_by_id(source, details)
+                trans = found_translation_by_id(source, details)
+                say "Moved to #{trans.to}\n"
                 solved = :moved
               else
                 say "not a block id: #{details}\n"
@@ -293,19 +300,19 @@ EOTXT
 
             menu.choice(:drop, 'Drop/Delete it.') do |command, details|
               drop(source)
+              say "Deleted."
               solved = :dropped
             end
 
             menu.choice(:all, 'Show all candidates') do |command, details|
-              matcher.write_results_by_finder($stdout, true, 23)
-              matcher.write_candidates_hint($stdout, true, 10)
+              limit = 2 * limit
+              matcher.puts_candidates(limit)
               say(prompt)
             end
 
             menu.choice(:quit, "Exit program.") { return false }
           end
         end
-        say("#{solved}\n") if solved
         return solved
       end
     end

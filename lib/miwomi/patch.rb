@@ -218,7 +218,7 @@ module Miwomi
         end
       end
 
-      if ask_for_deletion(source, 'No match found :(.')
+      if options.interactive && ask_for_deletion(source, 'No match found :(.')
         return :dropped
       end
 

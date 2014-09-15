@@ -192,6 +192,7 @@ module Miwomi
       to.find_by_id(source)
     end
 
+    # TODO refactor this against #apply
     def find_match(source)
       matcher = Matcher.new(source, list: to, options: options)
       benchmark "match #{source}" do
@@ -215,6 +216,10 @@ module Miwomi
           matcher.write_results_by_finder(hints)
           matcher.write_candidates_hint(hints)
         end
+      end
+
+      if ask_for_deletion(source, 'No match found :(.')
+        return :dropped
       end
 
       hints << argument_hint(source)
@@ -324,10 +329,28 @@ EOTXT
               say(prompt)
             end
 
-            menu.choice(:quit, "Exit program.") { return false }
+            menu.choice(:quit, "Exit program.") { exit }
           end
         end
         return solved
+      end
+    end
+
+    def ask_for_deletion(source, motivation='')
+      require 'highline/import'
+      choices = "ynq"
+      answer = ask("\n#{motivation} Drop #{source} [#{choices}]? ") do |q|
+        q.echo      = false
+        q.character = true
+        q.validate  = /\A[#{choices}]\Z/
+      end
+      case answer
+      when 'y'
+        drop(source)
+        say "Deleted.\n"
+        return :ok
+      else
+        return false
       end
     end
   end

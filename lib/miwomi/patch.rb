@@ -338,14 +338,14 @@ EOTXT
 
     def ask_for_deletion(source, motivation='')
       require 'highline/import'
-      choices = "ynq"
+      choices = "ydnq"
       answer = ask("\n#{motivation} Drop #{source} [#{choices}]? ") do |q|
         q.echo      = false
         q.character = true
         q.validate  = /\A[#{choices}]\Z/
       end
       case answer
-      when 'y'
+      when 'y', 'd'
         drop(source)
         say "Deleted.\n"
         return :ok
